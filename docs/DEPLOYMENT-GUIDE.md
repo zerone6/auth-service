@@ -471,3 +471,141 @@ User Request → Nginx
 - [PHASE3-OAUTH-IMPLEMENTATION.md](./PHASE3-OAUTH-IMPLEMENTATION.md)
 - [PHASE4-FRONTEND.md](./PHASE4-FRONTEND.md)
 - [PHASE5-NGINX-INTEGRATION.md](./PHASE5-NGINX-INTEGRATION.md)
+
+---
+
+## ⚠️ 중요 배포 주의사항
+
+### 1. 순차 빌드 필수
+
+Oracle Cloud ARM 서버의 메모리 제약으로 인해 **반드시 서비스를 순차적으로 빌드**해야 합니다.
+
+**GitHub Actions 배포 순서:**
+```bash
+# 순차 빌드 순서 (동시 빌드 금지!)
+1. main-page           # 가벼움
+2. auth-backend        # Node.js
+3. auth-frontend       # React
+4. realestate-backend  # Java/Maven - 메모리 많이 사용
+5. realestate-frontend # React - 메모리 많이 사용
+6. highschool          # React
+7. nginx               # 설정만
+```
+
+**잘못된 예시 (동시 빌드):**
+```bash
+# ❌ 이렇게 하면 메모리 부족으로 빌드 프리징!
+docker compose -f docker-compose.local.yml up -d --build
+```
+
+**올바른 예시 (순차 빌드):**
+```bash
+# ✅ 하나씩 순차적으로
+docker compose -f docker-compose.local.yml up -d --build main-page
+docker compose -f docker-compose.local.yml up -d --build auth-backend
+docker compose -f docker-compose.local.yml up -d --build auth-frontend
+# ... 이하 동일
+```
+
+### 2. 실서버 배포 전 개발환경 테스트 필수
+
+실서버에서 빌드 실패나 문제가 발생하면 시간이 많이 소요되므로, **반드시 로컬에서 프로덕션 빌드를 테스트**해야 합니다.
+
+#### 로컬 프로덕션 빌드 테스트 방법
+
+**방법 1: Vite Preview (Frontend만)**
+```bash
+# 프로젝트 디렉토리에서
+npm run build
+npm run preview
+
+# 예: auth-frontend
+cd /Users/seonpillhwang/GitHub/homegroup/auth-service/frontend
+npm run build
+npm run preview
+# http://localhost:4173 에서 확인
+```
+
+**방법 2: Docker 로컬 빌드**
+```bash
+# 개별 서비스 Docker 빌드 테스트
+cd /Users/seonpillhwang/GitHub/homegroup/auth-service/frontend
+docker build -t test-auth-frontend .
+
+# 실행 테스트
+docker run -p 8080:80 test-auth-frontend
+# http://localhost:8080 에서 확인
+```
+
+**방법 3: Docker Compose 로컬 테스트 (권장)**
+```bash
+# homegroup 전체 빌드 및 실행
+cd /Users/seonpillhwang/GitHub/homegroup
+
+# 순차 빌드
+docker compose -f docker-compose.local.yml build main-page
+docker compose -f docker-compose.local.yml build auth-backend
+docker compose -f docker-compose.local.yml build auth-frontend
+docker compose -f docker-compose.local.yml build realestate-backend
+docker compose -f docker-compose.local.yml build realestate-frontend
+docker compose -f docker-compose.local.yml build highschool
+
+# 전체 실행
+docker compose -f docker-compose.local.yml up -d
+
+# 로그 확인
+docker compose -f docker-compose.local.yml logs -f
+```
+
+**빌드 실패 시 체크리스트:**
+- [ ] Vite base path 설정 확인 (`vite.config.ts`)
+- [ ] Nginx 설정 확인 (Dockerfile의 nginx 설정)
+- [ ] React Router basename 설정 확인
+- [ ] 환경변수 설정 확인 (`.env`)
+- [ ] 포트 충돌 확인
+- [ ] 빌드 산출물 경로 확인 (`dist/` 폴더)
+
+**배포 전 필수 확인 사항:**
+```bash
+# 1. 로컬에서 빌드 성공 확인
+npm run build  # 또는 docker build
+
+# 2. 빌드 결과물 확인
+ls -la dist/   # 빌드 파일 존재 확인
+
+# 3. 로컬에서 실행 테스트
+npm run preview  # 또는 docker run
+
+# 4. 브라우저에서 동작 확인
+# - 페이지 로딩
+# - 라우팅 (새로고침 포함)
+# - Static asset 로딩 (JS, CSS, 이미지)
+# - API 호출
+
+# 5. 콘솔 에러 확인
+# - 404 에러 없는지
+# - MIME type 에러 없는지
+# - CORS 에러 없는지
+```
+
+### 배포 워크플로우 요약
+
+```
+1. 로컬 개발 완료
+   ↓
+2. dev 브랜치에 커밋
+   ↓
+3. 로컬에서 프로덕션 빌드 테스트 ✅ 필수!
+   ↓
+4. 빌드 성공 확인 후 main 브랜치 머지
+   ↓
+5. main → master 머지
+   ↓
+6. GitHub Actions 자동 배포 (순차 빌드)
+   ↓
+7. 실서버 확인
+```
+
+**시간 절약 팁:**
+- 로컬 테스트를 생략하면 실서버에서 문제 발생 시 수정 → 푸시 → 대기 → 실패 → 반복으로 시간 낭비
+- 로컬에서 5분 테스트하면 실서버에서 30분 디버깅 시간 절약!
