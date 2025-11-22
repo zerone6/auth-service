@@ -1,0 +1,32 @@
+version: '3.8'
+
+services:
+  # Auth Service - PostgreSQL Database (독립적인 컨테이너)
+  auth-db:
+    image: postgres:16-alpine
+    container_name: auth-db
+    environment:
+      - POSTGRES_DB=auth
+      - POSTGRES_USER=auth_user
+      - POSTGRES_PASSWORD=${AUTH_DB_PASSWORD:-auth_password_change_in_production}
+    volumes:
+      - auth-db-data:/var/lib/postgresql/data
+      - ./database/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
+    ports:
+      - "5433:5432"  # 외부 포트 5433 (기존 realestate-pg와 충돌 방지)
+    networks:
+      - auth-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U auth_user -d auth"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+networks:
+  auth-network:
+    driver: bridge
+
+volumes:
+  auth-db-data:
+    driver: local
