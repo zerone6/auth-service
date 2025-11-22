@@ -1,0 +1,154 @@
+.success-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding: 20px;
+  background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+}
+
+.success-card {
+  background: white;
+  border-radius: 16px;
+  padding: 48px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  max-width: 480px;
+  width: 100%;
+  text-align: center;
+}
+
+.success-icon {
+  font-size: 80px;
+  margin-bottom: 24px;
+  animation: checkmark 0.5s ease-in-out;
+}
+
+@keyframes checkmark {
+  0% {
+    transform: scale(0) rotate(0deg);
+  }
+  50% {
+    transform: scale(1.2) rotate(180deg);
+  }
+  100% {
+    transform: scale(1) rotate(360deg);
+  }
+}
+
+.success-card h1 {
+  font-size: 32px;
+  margin-bottom: 16px;
+  color: #333;
+}
+
+.success-message {
+  font-size: 16px;
+  color: #666;
+  margin-bottom: 32px;
+}
+
+.user-info {
+  background: #f8f9fa;
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 32px;
+}
+
+.user-email {
+  font-size: 18px;
+  font-weight: 500;
+  color: #333;
+  margin-bottom: 12px;
+}
+
+.user-badge {
+  display: inline-block;
+  padding: 6px 16px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.user-badge.admin {
+  background-color: #ffd700;
+  color: #333;
+}
+
+.user-badge.user {
+  background-color: #e0e0e0;
+  color: #666;
+}
+
+.success-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.admin-button {
+  background-color: #667eea;
+  color: white;
+  border: none;
+  padding: 12px 32px;
+  font-size: 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.admin-button:hover {
+  background-color: #5568d3;
+  border-color: transparent;
+}
+
+.logout-button {
+  background-color: #666;
+  color: white;
+  border: none;
+  padding: 12px 32px;
+  font-size: 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.logout-button:hover {
+  background-color: #555;
+  border-color: transparent;
+}
+
+@media (prefers-color-scheme: dark) {
+  .success-card {
+    background: #1a1a1a;
+  }
+
+  .success-card h1 {
+    color: #fff;
+  }
+
+  .success-message {
+    color: #aaa;
+  }
+
+  .user-info {
+    background: #2a2a2a;
+  }
+
+  .user-email {
+    color: #fff;
+  }
+}
+
+@media (max-width: 640px) {
+  .success-card {
+    padding: 32px 24px;
+  }
+
+  .success-icon {
+    font-size: 60px;
+  }
+
+  .success-card h1 {
+    font-size: 24px;
+  }
+}

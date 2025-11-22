@@ -1,0 +1,138 @@
+.rejected-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding: 20px;
+  background: linear-gradient(135deg, #eb3349 0%, #f45c43 100%);
+}
+
+.rejected-card {
+  background: white;
+  border-radius: 16px;
+  padding: 48px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  max-width: 560px;
+  width: 100%;
+  text-align: center;
+}
+
+.rejected-icon {
+  font-size: 80px;
+  margin-bottom: 24px;
+  animation: shake 0.5s;
+}
+
+@keyframes shake {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  10%, 30%, 50%, 70%, 90% {
+    transform: translateX(-10px);
+  }
+  20%, 40%, 60%, 80% {
+    transform: translateX(10px);
+  }
+}
+
+.rejected-card h1 {
+  font-size: 32px;
+  margin-bottom: 16px;
+  color: #333;
+}
+
+.rejected-message {
+  font-size: 18px;
+  color: #666;
+  margin-bottom: 16px;
+}
+
+.rejected-description {
+  font-size: 14px;
+  color: #888;
+  line-height: 1.6;
+  margin-bottom: 32px;
+}
+
+.rejected-info {
+  background: #fff3f3;
+  border-left: 4px solid #eb3349;
+  border-radius: 8px;
+  padding: 24px;
+  margin-bottom: 32px;
+  text-align: left;
+}
+
+.rejected-info h3 {
+  font-size: 18px;
+  margin-bottom: 12px;
+  color: #eb3349;
+}
+
+.rejected-info p {
+  color: #666;
+  font-size: 14px;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.logout-button {
+  background-color: #666;
+  color: white;
+  border: none;
+  padding: 12px 32px;
+  font-size: 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.logout-button:hover {
+  background-color: #555;
+  border-color: transparent;
+}
+
+@media (prefers-color-scheme: dark) {
+  .rejected-card {
+    background: #1a1a1a;
+  }
+
+  .rejected-card h1 {
+    color: #fff;
+  }
+
+  .rejected-message {
+    color: #aaa;
+  }
+
+  .rejected-description {
+    color: #888;
+  }
+
+  .rejected-info {
+    background: #2a1a1a;
+    border-left-color: #f45c43;
+  }
+
+  .rejected-info h3 {
+    color: #f45c43;
+  }
+
+  .rejected-info p {
+    color: #aaa;
+  }
+}
+
+@media (max-width: 640px) {
+  .rejected-card {
+    padding: 32px 24px;
+  }
+
+  .rejected-icon {
+    font-size: 60px;
+  }
+
+  .rejected-card h1 {
+    font-size: 24px;
+  }
+}

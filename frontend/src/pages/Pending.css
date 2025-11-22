@@ -1,0 +1,147 @@
+.pending-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding: 20px;
+  background: linear-gradient(135deg, #ffa751 0%, #ffe259 100%);
+}
+
+.pending-card {
+  background: white;
+  border-radius: 16px;
+  padding: 48px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  max-width: 560px;
+  width: 100%;
+  text-align: center;
+}
+
+.pending-icon {
+  font-size: 80px;
+  margin-bottom: 24px;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+}
+
+.pending-card h1 {
+  font-size: 32px;
+  margin-bottom: 16px;
+  color: #333;
+}
+
+.pending-message {
+  font-size: 18px;
+  color: #666;
+  margin-bottom: 24px;
+}
+
+.pending-description {
+  font-size: 14px;
+  color: #888;
+  line-height: 1.6;
+  margin-bottom: 32px;
+}
+
+.pending-info {
+  background: #f8f9fa;
+  border-radius: 8px;
+  padding: 24px;
+  margin-bottom: 32px;
+  text-align: left;
+}
+
+.pending-info h3 {
+  font-size: 18px;
+  margin-bottom: 16px;
+  color: #333;
+}
+
+.pending-info ul {
+  list-style: none;
+  padding: 0;
+}
+
+.pending-info li {
+  padding: 8px 0;
+  padding-left: 28px;
+  position: relative;
+  color: #666;
+  font-size: 14px;
+}
+
+.pending-info li::before {
+  content: '✓';
+  position: absolute;
+  left: 0;
+  color: #ffa751;
+  font-weight: bold;
+}
+
+.logout-button {
+  background-color: #666;
+  color: white;
+  border: none;
+  padding: 12px 32px;
+  font-size: 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.logout-button:hover {
+  background-color: #555;
+  border-color: transparent;
+}
+
+@media (prefers-color-scheme: dark) {
+  .pending-card {
+    background: #1a1a1a;
+  }
+
+  .pending-card h1 {
+    color: #fff;
+  }
+
+  .pending-message {
+    color: #aaa;
+  }
+
+  .pending-description {
+    color: #888;
+  }
+
+  .pending-info {
+    background: #2a2a2a;
+  }
+
+  .pending-info h3 {
+    color: #fff;
+  }
+
+  .pending-info li {
+    color: #aaa;
+  }
+}
+
+@media (max-width: 640px) {
+  .pending-card {
+    padding: 32px 24px;
+  }
+
+  .pending-icon {
+    font-size: 60px;
+  }
+
+  .pending-card h1 {
+    font-size: 24px;
+  }
+}
