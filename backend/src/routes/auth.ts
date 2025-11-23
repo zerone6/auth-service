@@ -77,7 +77,11 @@ router.get('/failure', (req: Request, res: Response) => {
  * Logout user
  */
 router.post('/logout', (req: Request, res: Response) => {
-  res.clearCookie('auth_token');
+  res.clearCookie('auth_token', {
+    httpOnly: true,
+    secure: config.nodeEnv === 'production',
+    sameSite: 'lax',
+  });
   res.json({
     success: true,
     message: 'Logged out successfully',
