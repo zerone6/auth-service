@@ -26,7 +26,12 @@ export function configurePassport() {
           const googleId = profile.id;
           const email = profile.emails?.[0]?.value;
           const name = profile.displayName;
-          const pictureUrl = profile.photos?.[0]?.value;
+          let pictureUrl = profile.photos?.[0]?.value;
+
+          // Upgrade Google profile picture to higher resolution
+          if (pictureUrl && pictureUrl.includes('googleusercontent.com')) {
+            pictureUrl = pictureUrl.replace(/=s\d+-c$/, '=s400-c');
+          }
 
           if (!email) {
             return done(new Error('No email found in Google profile'));
