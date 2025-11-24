@@ -92,21 +92,73 @@ router.post('/logout', (req: Request, res: Response) => {
  * GET /auth/me
  * Get current user info
  */
-router.get('/me', requireAuth, (req: Request, res: Response) => {
-  res.json({
-    user: req.user,
-  });
+router.get('/me', requireAuth, async (req: Request, res: Response) => {
+  try {
+    // Get full user info from database (includes picture_url)
+    const { findUserById } = await import('../db/queries');
+    const user = await findUserById(req.user.userId);
+
+    if (!user) {
+      return res.status(404).json({
+        error: 'Not Found',
+        message: 'User not found',
+      });
+    }
+
+    res.json({
+      user: {
+        id: user.id,
+        email: user.email,
+        name: user.name,
+        picture_url: user.picture_url,
+        role: user.role,
+        status: user.status,
+      },
+    });
+  } catch (error) {
+    console.error('Error fetching user:', error);
+    res.status(500).json({
+      error: 'Internal Server Error',
+      message: 'Failed to fetch user information',
+    });
+  }
 });
 
 /**
  * GET /auth/status
  * Check authentication status
  */
-router.get('/status', requireAuth, (req: Request, res: Response) => {
-  res.json({
-    authenticated: true,
-    user: req.user,
-  });
+router.get('/status', requireAuth, async (req: Request, res: Response) => {
+  try {
+    // Get full user info from database (includes picture_url)
+    const { findUserById } = await import('../db/queries');
+    const user = await findUserById(req.user!.userId);
+
+    if (!user) {
+      return res.status(404).json({
+        error: 'Not Found',
+        message: 'User not found',
+      });
+    }
+
+    res.json({
+      authenticated: true,
+      user: {
+        id: user.id,
+        email: user.email,
+        name: user.name,
+        picture_url: user.picture_url,
+        role: user.role,
+        status: user.status,
+      },
+    });
+  } catch (error) {
+    console.error('Error fetching user:', error);
+    res.status(500).json({
+      error: 'Internal Server Error',
+      message: 'Failed to fetch user information',
+    });
+  }
 });
 
 export default router;
