@@ -50,13 +50,13 @@ router.get(
     // Redirect based on user status
     if (user.status === 'pending') {
       // Redirect to pending approval page
-      return res.redirect(`${config.frontend.url}/auth/pending`);
+      return res.redirect(`${config.frontend.url}/?status=pending`);
     } else if (user.status === 'approved') {
-      // Redirect to success page
-      return res.redirect(`${config.frontend.url}/auth/success`);
+      // Redirect to success page (landing page)
+      return res.redirect(`${config.frontend.url}/`);
     } else {
       // Rejected
-      return res.redirect(`${config.frontend.url}/auth/rejected`);
+      return res.redirect(`${config.frontend.url}/?status=rejected`);
     }
   }
 );
