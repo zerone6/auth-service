@@ -15,26 +15,26 @@ const Pending: React.FC = () => {
     <div className="pending-container">
       <div className="pending-card">
         <div className="pending-icon">⏳</div>
-        <h1>Approval Pending</h1>
+        <h1>승인 대기 중</h1>
         <p className="pending-message">
-          Your account has been created successfully!
+          계정이 성공적으로 생성되었습니다!
         </p>
         <p className="pending-description">
-          Please wait for an administrator to approve your access.
-          You will receive an email notification once your account is approved.
+          관리자의 승인을 기다려주세요.
+          계정 승인 시 이메일로 알림을 받으실 수 있습니다.
         </p>
 
         <div className="pending-info">
-          <h3>What happens next?</h3>
+          <h3>다음 단계</h3>
           <ul>
-            <li>An administrator will review your request</li>
-            <li>You'll receive an email when approved</li>
-            <li>Once approved, you can sign in and access the service</li>
+            <li>관리자가 요청을 검토합니다</li>
+            <li>승인 시 이메일로 알림을 받습니다</li>
+            <li>승인 후 로그인하여 서비스를 이용할 수 있습니다</li>
           </ul>
         </div>
 
         <button className="logout-button" onClick={handleLogout}>
-          Sign Out
+          로그아웃
         </button>
       </div>
     </div>

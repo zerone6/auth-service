@@ -35,7 +35,7 @@ const Success: React.FC = () => {
     return (
       <div className="success-container">
         <div className="success-card">
-          <p>Loading...</p>
+          <p>로딩 중...</p>
         </div>
       </div>
     );
@@ -45,16 +45,16 @@ const Success: React.FC = () => {
     <div className="success-container">
       <div className="success-card">
         <div className="success-icon">✅</div>
-        <h1>Welcome!</h1>
+        <h1>환영합니다!</h1>
         <p className="success-message">
-          You have successfully signed in.
+          로그인에 성공하였습니다.
         </p>
 
         {user && (
           <div className="user-info">
             <p className="user-email">{user.email}</p>
             <span className={`user-badge ${user.role}`}>
-              {user.role === 'admin' ? '👑 Admin' : '👤 User'}
+              {user.role === 'admin' ? '👑 관리자' : '👤 사용자'}
             </span>
           </div>
         )}
@@ -62,11 +62,11 @@ const Success: React.FC = () => {
         <div className="success-actions">
           {user?.role === 'admin' && (
             <button className="admin-button" onClick={handleGoToAdmin}>
-              Go to Admin Dashboard
+              관리자 대시보드로 이동
             </button>
           )}
           <button className="logout-button" onClick={handleLogout}>
-            Sign Out
+            로그아웃
           </button>
         </div>
       </div>

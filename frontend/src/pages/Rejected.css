@@ -4,7 +4,7 @@
   align-items: center;
   min-height: 100vh;
   padding: 20px;
-  background: linear-gradient(135deg, #eb3349 0%, #f45c43 100%);
+  background: linear-gradient(to bottom right, #6366f1, #a855f7, #9333ea);
 }
 
 .rejected-card {

@@ -11,7 +11,7 @@ export interface AuthState {
   loading: boolean;
 }
 
-export type OAuthProvider = 'google' | 'naver' | 'facebook' | 'line';
+export type OAuthProvider = 'google' | 'apple' | 'facebook' | 'naver' | 'line';
 
 export interface OAuthProviderConfig {
   id: OAuthProvider;

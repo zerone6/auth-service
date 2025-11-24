@@ -1,12 +1,10 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
 import { oauthProviders } from '../config/oauthProviders';
 import OAuthProviderButton from '../components/OAuthProviderButton';
 import { OAuthProviderConfig } from '../types/auth';
 import './Login.css';
 
 const Login: React.FC = () => {
-  const navigate = useNavigate();
 
   const handleProviderClick = (provider: OAuthProviderConfig) => {
     if (provider.enabled && provider.url) {
@@ -19,8 +17,8 @@ const Login: React.FC = () => {
     <div className="login-container">
       <div className="login-card">
         <div className="login-header">
-          <h1>🔐 Sign In</h1>
-          <p>Choose your preferred authentication method</p>
+          <h1>로그인 선택</h1>
+          <p>원하시는 계정으로 로그인해주세요</p>
         </div>
 
         <div className="oauth-providers">
@@ -31,18 +29,6 @@ const Login: React.FC = () => {
               onClick={handleProviderClick}
             />
           ))}
-        </div>
-
-        <div className="login-footer">
-          <p>
-            Don't have an account?{' '}
-            <button
-              className="link-button"
-              onClick={() => navigate('/signup')}
-            >
-              Sign Up
-            </button>
-          </p>
         </div>
       </div>
     </div>

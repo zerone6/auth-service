@@ -1,68 +1,55 @@
 .oauth-button {
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   gap: 12px;
   width: 100%;
-  max-width: 400px;
-  padding: 14px 24px;
+  padding: 12px 16px;
   font-size: 16px;
-  font-weight: 500;
-  border: 2px solid;
+  font-weight: 400;
+  border: 1px solid #e5e7eb;
   border-radius: 8px;
   background-color: white;
   color: #333;
   cursor: pointer;
   transition: all 0.2s ease;
-  position: relative;
+  height: 48px;
 }
 
-.oauth-button:not(.disabled):hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+.oauth-button:hover {
+  background-color: #f9fafb;
+  border-color: #d1d5db;
 }
 
-.oauth-button:not(.disabled):active {
-  transform: translateY(0);
+.oauth-button:active {
+  transform: scale(0.98);
 }
 
 .oauth-button.disabled {
   opacity: 0.5;
   cursor: not-allowed;
-  background-color: #f5f5f5;
-  color: #999;
 }
 
-.oauth-icon {
-  font-size: 24px;
-  line-height: 1;
+.oauth-icon-svg {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
 }
 
 .oauth-name {
   flex: 1;
-  text-align: center;
-}
-
-.oauth-badge {
-  position: absolute;
-  top: -8px;
-  right: -8px;
-  background-color: #ff9800;
-  color: white;
-  font-size: 10px;
-  padding: 2px 8px;
-  border-radius: 12px;
-  font-weight: 600;
+  text-align: left;
 }
 
 @media (prefers-color-scheme: dark) {
   .oauth-button {
     background-color: #2a2a2a;
     color: #fff;
+    border-color: #404040;
   }
 
-  .oauth-button.disabled {
-    background-color: #1a1a1a;
-    color: #666;
+  .oauth-button:hover {
+    background-color: #333;
+    border-color: #555;
   }
 }

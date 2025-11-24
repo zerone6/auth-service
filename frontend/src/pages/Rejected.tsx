@@ -15,25 +15,23 @@ const Rejected: React.FC = () => {
     <div className="rejected-container">
       <div className="rejected-card">
         <div className="rejected-icon">❌</div>
-        <h1>Access Denied</h1>
+        <h1>접근 거부</h1>
         <p className="rejected-message">
-          Your account request has been rejected by an administrator.
+          관리자에 의해 계정 요청이 거부되었습니다.
         </p>
         <p className="rejected-description">
-          If you believe this is a mistake, please contact the system administrator
-          for more information.
+          실수라고 생각되시면 시스템 관리자에게 문의하여 자세한 정보를 확인하세요.
         </p>
 
         <div className="rejected-info">
-          <h3>Need help?</h3>
+          <h3>도움이 필요하신가요?</h3>
           <p>
-            Contact your organization's administrator to understand why your
-            access was denied and what steps you can take next.
+            조직의 관리자에게 연락하여 접근이 거부된 이유와 다음에 취할 수 있는 조치를 확인하세요.
           </p>
         </div>
 
         <button className="logout-button" onClick={handleLogout}>
-          Return to Login
+          로그인으로 돌아가기
         </button>
       </div>
     </div>
