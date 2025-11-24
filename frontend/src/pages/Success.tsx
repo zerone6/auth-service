@@ -48,6 +48,35 @@ const Success: React.FC = () => {
     );
   }
 
+  // If not authenticated, show login required
+  if (!user) {
+    return (
+      <div className="success-page">
+        <header className="success-header">
+          <div className="header-container">
+            <h1>가족 정보 공유 사이트</h1>
+          </div>
+        </header>
+
+        <main className="success-main">
+          <div className="success-container" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <div className="login-card">
+              <h2>로그인이 필요합니다</h2>
+              <p>서비스를 이용하시려면 로그인해주세요</p>
+              <a href="/auth/login" className="login-button">
+                로그인
+              </a>
+            </div>
+          </div>
+        </main>
+
+        <footer className="success-footer">
+          <p>&copy; 2024 Family Services. All rights reserved.</p>
+        </footer>
+      </div>
+    );
+  }
+
   return (
     <div className="success-page">
       {/* Header */}
@@ -104,15 +133,18 @@ const Success: React.FC = () => {
       <main className="success-main">
         <div className="success-container">
           <div className="services-grid">
-            <div className="service-card">
+            <a href="/highschool/" className="service-card">
               <div className="service-icon calendar">📅</div>
               <div className="service-content">
                 <h2>일시일정</h2>
                 <p>선택</p>
               </div>
-            </div>
+            </a>
 
-            <div className="service-card disabled">
+            <div
+              className="service-card disabled"
+              onClick={() => alert('서비스 준비중입니다.')}
+            >
               <div className="service-icon home">🏠</div>
               <div className="service-content">
                 <h2>부동산</h2>

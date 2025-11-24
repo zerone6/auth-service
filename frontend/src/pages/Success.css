@@ -190,6 +190,8 @@
   display: flex;
   align-items: center;
   gap: 16px;
+  text-decoration: none;
+  color: inherit;
 }
 
 .service-card:hover {
@@ -239,6 +241,50 @@
   font-size: 1rem;
   margin: 0;
   margin-top: 4px;
+}
+
+/* Login Card (unauthenticated state) */
+.login-card {
+  background: white;
+  border-radius: 16px;
+  padding: 60px 40px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  max-width: 480px;
+  text-align: center;
+}
+
+.login-card h2 {
+  color: #1f2937;
+  font-size: 1.875rem;
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+
+.login-card p {
+  color: #6b7280;
+  margin-bottom: 32px;
+  font-size: 1.125rem;
+}
+
+.login-button {
+  background: white;
+  color: #9333ea;
+  border: none;
+  padding: 14px 48px;
+  font-size: 1.125rem;
+  font-weight: 600;
+  border-radius: 8px;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-block;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s;
+}
+
+.login-button:hover {
+  background: rgba(255, 255, 255, 0.9);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 /* Footer */
