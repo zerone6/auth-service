@@ -14,6 +14,9 @@ import {
   removeUserSelectedSchool,
   clearUserSelectedSchools,
   updateSelectedSchoolsOrder,
+  excludeSchool,
+  includeSchool,
+  getUserExcludedSchools,
   CreateSchoolInput,
   UpdateCalculatorDataInput
 } from '../db/calculator-queries';
@@ -264,6 +267,57 @@ router.put('/selected-schools/order', requireAuth, async (req: Request, res: Res
   } catch (error) {
     console.error('Error updating selected schools order:', error);
     res.status(500).json({ error: 'Failed to update display order' });
+  }
+});
+
+// ============= Excluded Schools Routes =============
+
+/**
+ * POST /api/calculator/excluded-schools/:schoolId
+ * Exclude a school from user's available list
+ */
+router.post('/excluded-schools/:schoolId', requireAuth, async (req: Request, res: Response) => {
+  try {
+    const userId = req.user!.userId;
+    const schoolId = parseInt(req.params.schoolId);
+
+    await excludeSchool(userId, schoolId);
+    res.json({ message: 'School excluded successfully' });
+  } catch (error) {
+    console.error('Error excluding school:', error);
+    res.status(500).json({ error: 'Failed to exclude school' });
+  }
+});
+
+/**
+ * DELETE /api/calculator/excluded-schools/:schoolId
+ * Include a school back to user's available list
+ */
+router.delete('/excluded-schools/:schoolId', requireAuth, async (req: Request, res: Response) => {
+  try {
+    const userId = req.user!.userId;
+    const schoolId = parseInt(req.params.schoolId);
+
+    await includeSchool(userId, schoolId);
+    res.json({ message: 'School included successfully' });
+  } catch (error) {
+    console.error('Error including school:', error);
+    res.status(500).json({ error: 'Failed to include school' });
+  }
+});
+
+/**
+ * GET /api/calculator/excluded-schools
+ * Get user's excluded schools
+ */
+router.get('/excluded-schools', requireAuth, async (req: Request, res: Response) => {
+  try {
+    const userId = req.user!.userId;
+    const schools = await getUserExcludedSchools(userId);
+    res.json({ schools });
+  } catch (error) {
+    console.error('Error fetching excluded schools:', error);
+    res.status(500).json({ error: 'Failed to fetch excluded schools' });
   }
 });
 
