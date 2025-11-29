@@ -26,6 +26,7 @@ const Admin: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'pending' | 'all'>('pending');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [selectedUsers, setSelectedUsers] = useState<Set<number>>(new Set());
 
   useEffect(() => {
     loadData();
@@ -101,6 +102,86 @@ const Admin: React.FC = () => {
     }
   };
 
+  const handleCheckboxChange = (userId: number) => {
+    const newSelected = new Set(selectedUsers);
+    if (newSelected.has(userId)) {
+      newSelected.delete(userId);
+    } else {
+      newSelected.add(userId);
+    }
+    setSelectedUsers(newSelected);
+  };
+
+  const handleSelectAll = () => {
+    if (selectedUsers.size === pendingUsers.length) {
+      setSelectedUsers(new Set());
+    } else {
+      setSelectedUsers(new Set(pendingUsers.map((u) => u.id)));
+    }
+  };
+
+  const handleBulkApprove = async () => {
+    if (selectedUsers.size === 0) {
+      alert('Please select users to approve');
+      return;
+    }
+
+    if (!confirm(`Are you sure you want to approve ${selectedUsers.size} user(s)?`)) {
+      return;
+    }
+
+    try {
+      setLoading(true);
+      const approvePromises = Array.from(selectedUsers).map((userId) =>
+        fetch(`/admin/users/${userId}/approve`, {
+          method: 'POST',
+          credentials: 'include',
+        })
+      );
+
+      await Promise.all(approvePromises);
+      setSelectedUsers(new Set());
+      await loadData();
+      alert('Selected users have been approved');
+    } catch (err) {
+      console.error(err);
+      alert('Failed to approve users');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleBulkReject = async () => {
+    if (selectedUsers.size === 0) {
+      alert('Please select users to reject');
+      return;
+    }
+
+    if (!confirm(`Are you sure you want to reject ${selectedUsers.size} user(s)?`)) {
+      return;
+    }
+
+    try {
+      setLoading(true);
+      const rejectPromises = Array.from(selectedUsers).map((userId) =>
+        fetch(`/admin/users/${userId}/reject`, {
+          method: 'POST',
+          credentials: 'include',
+        })
+      );
+
+      await Promise.all(rejectPromises);
+      setSelectedUsers(new Set());
+      await loadData();
+      alert('Selected users have been rejected');
+    } catch (err) {
+      console.error(err);
+      alert('Failed to reject users');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleLogout = () => {
     fetch('/auth/logout', { method: 'POST', credentials: 'include' })
       .then(() => navigate('/login'))
@@ -161,17 +242,44 @@ const Admin: React.FC = () => {
       <div className="admin-tabs">
         <button
           className={`tab ${activeTab === 'pending' ? 'active' : ''}`}
-          onClick={() => setActiveTab('pending')}
+          onClick={() => {
+            setActiveTab('pending');
+            setSelectedUsers(new Set());
+          }}
         >
           Pending ({pendingUsers.length})
         </button>
         <button
           className={`tab ${activeTab === 'all' ? 'active' : ''}`}
-          onClick={() => setActiveTab('all')}
+          onClick={() => {
+            setActiveTab('all');
+            setSelectedUsers(new Set());
+          }}
         >
           All Users ({allUsers.length})
         </button>
       </div>
+
+      {activeTab === 'pending' && pendingUsers.length > 0 && (
+        <div style={{ marginBottom: '20px', display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
+          <button
+            className="approve-btn"
+            onClick={handleBulkApprove}
+            disabled={selectedUsers.size === 0}
+            style={{ padding: '10px 20px', cursor: selectedUsers.size === 0 ? 'not-allowed' : 'pointer', opacity: selectedUsers.size === 0 ? 0.5 : 1 }}
+          >
+            ✓ Approve Selected ({selectedUsers.size})
+          </button>
+          <button
+            className="reject-btn"
+            onClick={handleBulkReject}
+            disabled={selectedUsers.size === 0}
+            style={{ padding: '10px 20px', cursor: selectedUsers.size === 0 ? 'not-allowed' : 'pointer', opacity: selectedUsers.size === 0 ? 0.5 : 1 }}
+          >
+            ✗ Reject Selected ({selectedUsers.size})
+          </button>
+        </div>
+      )}
 
       <div className="users-table-container">
         {displayUsers.length === 0 ? (
@@ -182,6 +290,16 @@ const Admin: React.FC = () => {
           <table className="users-table">
             <thead>
               <tr>
+                {activeTab === 'pending' && (
+                  <th style={{ width: '50px' }}>
+                    <input
+                      type="checkbox"
+                      checked={selectedUsers.size === pendingUsers.length && pendingUsers.length > 0}
+                      onChange={handleSelectAll}
+                      style={{ cursor: 'pointer' }}
+                    />
+                  </th>
+                )}
                 <th>Email</th>
                 <th>Name</th>
                 <th>Role</th>
@@ -193,6 +311,16 @@ const Admin: React.FC = () => {
             <tbody>
               {displayUsers.map((user) => (
                 <tr key={user.id}>
+                  {activeTab === 'pending' && (
+                    <td>
+                      <input
+                        type="checkbox"
+                        checked={selectedUsers.has(user.id)}
+                        onChange={() => handleCheckboxChange(user.id)}
+                        style={{ cursor: 'pointer' }}
+                      />
+                    </td>
+                  )}
                   <td>{user.email}</td>
                   <td>{user.name || '-'}</td>
                   <td>
