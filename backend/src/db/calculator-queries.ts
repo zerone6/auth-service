@@ -140,14 +140,13 @@ export async function createSchool(input: CreateSchoolInput): Promise<School> {
 }
 
 /**
- * Get all schools created by user (for dropdown)
+ * Get all schools available to user (shared across all users)
  * Excludes schools that the user has marked as excluded
  */
 export async function getSchoolsByUser(userId: number): Promise<School[]> {
   const result = await pool.query(
     `SELECT s.* FROM schools s
-     WHERE s.created_by = $1
-     AND s.id NOT IN (
+     WHERE s.id NOT IN (
        SELECT school_id FROM user_excluded_schools WHERE user_id = $1
      )
      ORDER BY s.created_at DESC`,
