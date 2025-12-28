@@ -2,7 +2,7 @@
 import { Router, Request, Response, NextFunction } from 'express';
 import passport from 'passport';
 import { generateToken } from '../services/jwt';
-import { User } from '../db/queries';
+import { User, findUserById } from '../db/queries';
 import { config } from '../config';
 import { requireAuth } from '../middleware/auth';
 
@@ -95,7 +95,6 @@ router.post('/logout', (req: Request, res: Response) => {
 router.get('/me', requireAuth, async (req: Request, res: Response) => {
   try {
     // Get full user info from database (includes picture_url)
-    const { findUserById } = await import('../db/queries');
     const user = await findUserById(req.user.userId);
 
     if (!user) {
@@ -131,7 +130,6 @@ router.get('/me', requireAuth, async (req: Request, res: Response) => {
 router.get('/status', requireAuth, async (req: Request, res: Response) => {
   try {
     // Get full user info from database (includes picture_url)
-    const { findUserById } = await import('../db/queries');
     const user = await findUserById(req.user!.userId);
 
     if (!user) {
