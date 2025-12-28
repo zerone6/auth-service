@@ -11,7 +11,6 @@ import { configurePassport } from './services/passport';
 import authRoutes from './routes/auth';
 import verifyRoutes from './routes/verify';
 import adminRoutes from './routes/admin';
-import calculatorRoutes from './routes/calculator';
 
 const app = express();
 
@@ -70,7 +69,6 @@ app.get('/db/health', async (req: Request, res: Response) => {
 app.use('/auth', authRoutes);
 app.use('/verify', verifyRoutes);
 app.use('/admin', adminRoutes);
-app.use('/api/calculator', calculatorRoutes);
 
 // 404 handler
 app.use((req: Request, res: Response) => {
@@ -115,7 +113,6 @@ async function startServer() {
 ║   - GET  /auth/google         (Google OAuth login)       ║
 ║   - GET  /verify              (Nginx auth_request)       ║
 ║   - GET  /admin/*             (Admin API)                ║
-║   - *    /api/calculator/*    (Calculator API)           ║
 ║                                                           ║
 ╚═══════════════════════════════════════════════════════════╝
       `);
