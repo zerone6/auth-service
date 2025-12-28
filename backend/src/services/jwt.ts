@@ -1,5 +1,4 @@
-// @ts-nocheck
-import jwt from 'jsonwebtoken';
+import jwt, { SignOptions } from 'jsonwebtoken';
 import { config } from '../config';
 import { User } from '../db/queries';
 
@@ -21,9 +20,11 @@ export function generateToken(user: User): string {
     status: user.status,
   };
 
-  return jwt.sign(payload, config.jwt.secret, {
-    expiresIn: config.jwt.expiresIn,
-  });
+  const options: SignOptions = {
+    expiresIn: config.jwt.expiresIn as jwt.SignOptions['expiresIn'],
+  };
+
+  return jwt.sign(payload, config.jwt.secret, options);
 }
 
 /**

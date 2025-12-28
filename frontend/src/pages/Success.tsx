@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { User } from '../types/auth';
-import './Success.css';
+import styles from './Success.module.css';
 
 const Success: React.FC = () => {
   const navigate = useNavigate();
@@ -40,8 +40,8 @@ const Success: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="success-page">
-        <div className="success-container">
+      <div className={styles.successPage}>
+        <div className={styles.successContainer}>
           <p>로딩 중...</p>
         </div>
       </div>
@@ -51,26 +51,26 @@ const Success: React.FC = () => {
   // If not authenticated, show login required
   if (!user) {
     return (
-      <div className="success-page">
-        <header className="success-header">
-          <div className="header-container">
+      <div className={styles.successPage}>
+        <header className={styles.successHeader}>
+          <div className={styles.headerContainer}>
             <h1>가족 정보 공유 사이트</h1>
           </div>
         </header>
 
-        <main className="success-main">
-          <div className="success-container" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <div className="login-card">
+        <main className={styles.successMain}>
+          <div className={styles.successContainer} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <div className={styles.loginCard}>
               <h2>로그인이 필요합니다</h2>
               <p>서비스를 이용하시려면 로그인해주세요</p>
-              <a href="/auth/login" className="login-button">
+              <a href="/auth/login" className={styles.loginButton}>
                 로그인
               </a>
             </div>
           </div>
         </main>
 
-        <footer className="success-footer">
+        <footer className={styles.successFooter}>
           <p>&copy; 2024 Family Services. All rights reserved.</p>
         </footer>
       </div>
@@ -78,48 +78,48 @@ const Success: React.FC = () => {
   }
 
   return (
-    <div className="success-page">
+    <div className={styles.successPage}>
       {/* Header */}
-      <header className="success-header">
-        <div className="header-container">
+      <header className={styles.successHeader}>
+        <div className={styles.headerContainer}>
           <h1>가족 정보 공유 사이트</h1>
 
           {user && (
-            <div className="profile-menu">
+            <div className={styles.profileMenu}>
               <button
-                className="profile-button"
+                className={styles.profileButton}
                 onClick={() => setDropdownOpen(!dropdownOpen)}
               >
-                <div className="avatar">
+                <div className={styles.avatar}>
                   {getUserInitial()}
                 </div>
               </button>
 
               {dropdownOpen && (
-                <div className="dropdown-menu">
-                  <div className="dropdown-header">
-                    <div className="dropdown-avatar">
+                <div className={styles.dropdownMenu}>
+                  <div className={styles.dropdownHeader}>
+                    <div className={styles.dropdownAvatar}>
                       {getUserInitial()}
                     </div>
-                    <div className="dropdown-info">
-                      <p className="dropdown-email">{user.email}</p>
-                      <span className={`dropdown-badge ${user.role}`}>
+                    <div className={styles.dropdownInfo}>
+                      <p className={styles.dropdownEmail}>{user.email}</p>
+                      <span className={`${styles.dropdownBadge} ${user.role === 'admin' ? styles.dropdownBadgeAdmin : styles.dropdownBadgeUser}`}>
                         {user.role === 'admin' ? '관리자' : '사용자'}
                       </span>
                     </div>
                   </div>
 
-                  <div className="dropdown-divider"></div>
+                  <div className={styles.dropdownDivider}></div>
 
                   {user.role === 'admin' && (
-                    <button className="dropdown-item" onClick={handleGoToAdmin}>
-                      <span className="dropdown-icon">👑</span>
+                    <button className={styles.dropdownItem} onClick={handleGoToAdmin}>
+                      <span className={styles.dropdownIcon}>👑</span>
                       관리자 대시보드
                     </button>
                   )}
 
-                  <button className="dropdown-item" onClick={handleLogout}>
-                    <span className="dropdown-icon">🚪</span>
+                  <button className={styles.dropdownItem} onClick={handleLogout}>
+                    <span className={styles.dropdownIcon}>🚪</span>
                     로그아웃
                   </button>
                 </div>
@@ -130,23 +130,23 @@ const Success: React.FC = () => {
       </header>
 
       {/* Main Content */}
-      <main className="success-main">
-        <div className="success-container">
-          <div className="services-grid">
-            <a href="/highschool/" className="service-card">
-              <div className="service-icon calendar">📅</div>
-              <div className="service-content">
+      <main className={styles.successMain}>
+        <div className={styles.successContainer}>
+          <div className={styles.servicesGrid}>
+            <a href="/highschool/" className={styles.serviceCard}>
+              <div className={`${styles.serviceIcon} ${styles.serviceIconCalendar}`}>📅</div>
+              <div className={styles.serviceContent}>
                 <h2>일시일정</h2>
                 <p>선택</p>
               </div>
             </a>
 
             <div
-              className="service-card disabled"
+              className={`${styles.serviceCard} ${styles.serviceCardDisabled}`}
               onClick={() => alert('서비스 준비중입니다.')}
             >
-              <div className="service-icon home">🏠</div>
-              <div className="service-content">
+              <div className={`${styles.serviceIcon} ${styles.serviceIconHome}`}>🏠</div>
+              <div className={styles.serviceContent}>
                 <h2>부동산</h2>
                 <p>계산기</p>
               </div>
@@ -156,7 +156,7 @@ const Success: React.FC = () => {
       </main>
 
       {/* Footer */}
-      <footer className="success-footer">
+      <footer className={styles.successFooter}>
         <p>&copy; 2024 Family Services. All rights reserved.</p>
       </footer>
     </div>

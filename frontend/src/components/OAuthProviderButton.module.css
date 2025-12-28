@@ -1,4 +1,4 @@
-.oauth-button {
+.oauthButton {
   display: flex;
   align-items: center;
   justify-content: flex-start;
@@ -16,39 +16,39 @@
   height: 48px;
 }
 
-.oauth-button:hover {
+.oauthButton:hover {
   background-color: #f9fafb;
   border-color: #d1d5db;
 }
 
-.oauth-button:active {
+.oauthButton:active {
   transform: scale(0.98);
 }
 
-.oauth-button.disabled {
+.disabled {
   opacity: 0.5;
   cursor: not-allowed;
 }
 
-.oauth-icon-svg {
+.oauthIconSvg {
   width: 20px;
   height: 20px;
   flex-shrink: 0;
 }
 
-.oauth-name {
+.oauthName {
   flex: 1;
   text-align: left;
 }
 
 @media (prefers-color-scheme: dark) {
-  .oauth-button {
+  .oauthButton {
     background-color: #2a2a2a;
     color: #fff;
     border-color: #404040;
   }
 
-  .oauth-button:hover {
+  .oauthButton:hover {
     background-color: #333;
     border-color: #555;
   }

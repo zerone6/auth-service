@@ -1,16 +1,29 @@
-// @ts-nocheck
-import { Router, Request, Response, NextFunction } from 'express';
+import { Router, Request, Response } from 'express';
 import passport from 'passport';
 import { generateToken } from '../services/jwt';
 import { User } from '../db/queries';
 import { config } from '../config';
 import { requireAuth } from '../middleware/auth';
+import {
+  asyncHandler,
+  NotFoundError,
+  InternalError,
+} from '../middleware/errorHandler';
 
 const router = Router();
 
 /**
- * GET /auth/google
- * Initiate Google OAuth flow
+ * @swagger
+ * /auth/google:
+ *   get:
+ *     summary: Google OAuth 로그인 시작
+ *     description: |
+ *       Google OAuth 2.0 인증 플로우를 시작합니다.
+ *       사용자를 Google 로그인 페이지로 리다이렉트합니다.
+ *     tags: [Auth]
+ *     responses:
+ *       302:
+ *         description: Google OAuth 페이지로 리다이렉트
  */
 router.get(
   '/google',
@@ -20,8 +33,31 @@ router.get(
 );
 
 /**
- * GET /auth/google/callback
- * Google OAuth callback
+ * @swagger
+ * /auth/google/callback:
+ *   get:
+ *     summary: Google OAuth 콜백
+ *     description: |
+ *       Google OAuth 인증 완료 후 콜백 엔드포인트.
+ *       JWT 토큰을 생성하고 쿠키에 저장한 후 사용자 상태에 따라 리다이렉트합니다.
+ *       - approved: 메인 페이지로 리다이렉트
+ *       - pending: 승인 대기 페이지로 리다이렉트
+ *       - rejected: 거부 페이지로 리다이렉트
+ *     tags: [Auth]
+ *     parameters:
+ *       - name: code
+ *         in: query
+ *         description: Google OAuth 인증 코드
+ *         schema:
+ *           type: string
+ *     responses:
+ *       302:
+ *         description: 사용자 상태에 따른 페이지로 리다이렉트
+ *         headers:
+ *           Set-Cookie:
+ *             description: JWT 토큰이 포함된 auth_token 쿠키
+ *             schema:
+ *               type: string
  */
 router.get(
   '/google/callback',
@@ -62,19 +98,58 @@ router.get(
 );
 
 /**
- * GET /auth/failure
- * Authentication failure page
+ * @swagger
+ * /auth/failure:
+ *   get:
+ *     summary: 인증 실패 페이지
+ *     description: OAuth 인증 실패 시 반환되는 에러 응답
+ *     tags: [Auth]
+ *     responses:
+ *       401:
+ *         description: 인증 실패
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ApiErrorResponse'
+ *             example:
+ *               success: false
+ *               error:
+ *                 code: AUTH_FAILED
+ *                 message: Google authentication failed
+ *               timestamp: "2025-12-28T12:00:00.000Z"
+ *               path: /failure
  */
 router.get('/failure', (req: Request, res: Response) => {
   res.status(401).json({
-    error: 'Authentication failed',
-    message: 'Google authentication failed',
+    success: false,
+    error: {
+      code: 'AUTH_FAILED',
+      message: 'Google authentication failed',
+    },
+    timestamp: new Date().toISOString(),
+    path: req.path,
   });
 });
 
 /**
- * POST /auth/logout
- * Logout user
+ * @swagger
+ * /auth/logout:
+ *   post:
+ *     summary: 로그아웃
+ *     description: auth_token 쿠키를 삭제하여 사용자를 로그아웃합니다.
+ *     tags: [Auth]
+ *     responses:
+ *       200:
+ *         description: 로그아웃 성공
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ApiSuccessResponse'
+ *             example:
+ *               success: true
+ *               data:
+ *                 message: Logged out successfully
+ *               timestamp: "2025-12-28T12:00:00.000Z"
  */
 router.post('/logout', (req: Request, res: Response) => {
   res.clearCookie('auth_token', {
@@ -84,81 +159,153 @@ router.post('/logout', (req: Request, res: Response) => {
   });
   res.json({
     success: true,
-    message: 'Logged out successfully',
+    data: { message: 'Logged out successfully' },
+    timestamp: new Date().toISOString(),
   });
 });
 
 /**
- * GET /auth/me
- * Get current user info
+ * @swagger
+ * /auth/me:
+ *   get:
+ *     summary: 현재 사용자 정보 조회
+ *     description: 인증된 사용자의 프로필 정보를 반환합니다.
+ *     tags: [Auth]
+ *     security:
+ *       - cookieAuth: []
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: 사용자 정보 반환
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     user:
+ *                       $ref: '#/components/schemas/User'
+ *                 timestamp:
+ *                   type: string
+ *                   format: date-time
+ *       401:
+ *         $ref: '#/components/responses/UnauthorizedError'
+ *       404:
+ *         $ref: '#/components/responses/NotFoundError'
  */
-router.get('/me', requireAuth, async (req: Request, res: Response) => {
-  try {
-    // Get full user info from database (includes picture_url)
-    const { findUserById } = await import('../db/queries');
-    const user = await findUserById(req.user.userId);
+router.get(
+  '/me',
+  requireAuth,
+  asyncHandler(async (req: Request, res: Response) => {
+    try {
+      // Get full user info from database (includes picture_url)
+      const { findUserById } = await import('../db/queries');
+      const user = await findUserById(req.user!.userId!);
 
-    if (!user) {
-      return res.status(404).json({
-        error: 'Not Found',
-        message: 'User not found',
+      if (!user) {
+        throw new NotFoundError('User not found');
+      }
+
+      res.json({
+        success: true,
+        data: {
+          user: {
+            id: user.id,
+            email: user.email,
+            name: user.name,
+            picture_url: user.picture_url,
+            role: user.role,
+            status: user.status,
+          },
+        },
+        timestamp: new Date().toISOString(),
       });
+    } catch (error) {
+      if (error instanceof NotFoundError) {
+        throw error;
+      }
+      throw new InternalError('Failed to fetch user information');
     }
-
-    res.json({
-      user: {
-        id: user.id,
-        email: user.email,
-        name: user.name,
-        picture_url: user.picture_url,
-        role: user.role,
-        status: user.status,
-      },
-    });
-  } catch (error) {
-    console.error('Error fetching user:', error);
-    res.status(500).json({
-      error: 'Internal Server Error',
-      message: 'Failed to fetch user information',
-    });
-  }
-});
+  })
+);
 
 /**
- * GET /auth/status
- * Check authentication status
+ * @swagger
+ * /auth/status:
+ *   get:
+ *     summary: 인증 상태 확인
+ *     description: 현재 사용자의 인증 상태와 프로필 정보를 반환합니다.
+ *     tags: [Auth]
+ *     security:
+ *       - cookieAuth: []
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: 인증 상태 반환
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                   example: true
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     authenticated:
+ *                       type: boolean
+ *                       example: true
+ *                     user:
+ *                       $ref: '#/components/schemas/User'
+ *                 timestamp:
+ *                   type: string
+ *                   format: date-time
+ *       401:
+ *         $ref: '#/components/responses/UnauthorizedError'
+ *       404:
+ *         $ref: '#/components/responses/NotFoundError'
  */
-router.get('/status', requireAuth, async (req: Request, res: Response) => {
-  try {
-    // Get full user info from database (includes picture_url)
-    const { findUserById } = await import('../db/queries');
-    const user = await findUserById(req.user!.userId);
+router.get(
+  '/status',
+  requireAuth,
+  asyncHandler(async (req: Request, res: Response) => {
+    try {
+      // Get full user info from database (includes picture_url)
+      const { findUserById } = await import('../db/queries');
+      const user = await findUserById(req.user!.userId!);
 
-    if (!user) {
-      return res.status(404).json({
-        error: 'Not Found',
-        message: 'User not found',
+      if (!user) {
+        throw new NotFoundError('User not found');
+      }
+
+      res.json({
+        success: true,
+        data: {
+          authenticated: true,
+          user: {
+            id: user.id,
+            email: user.email,
+            name: user.name,
+            picture_url: user.picture_url,
+            role: user.role,
+            status: user.status,
+          },
+        },
+        timestamp: new Date().toISOString(),
       });
+    } catch (error) {
+      if (error instanceof NotFoundError) {
+        throw error;
+      }
+      throw new InternalError('Failed to fetch user information');
     }
-
-    res.json({
-      authenticated: true,
-      user: {
-        id: user.id,
-        email: user.email,
-        name: user.name,
-        picture_url: user.picture_url,
-        role: user.role,
-        status: user.status,
-      },
-    });
-  } catch (error) {
-    console.error('Error fetching user:', error);
-    res.status(500).json({
-      error: 'Internal Server Error',
-      message: 'Failed to fetch user information',
-    });
-  }
-});
+  })
+);
 
 export default router;

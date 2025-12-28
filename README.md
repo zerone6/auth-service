@@ -1,41 +1,213 @@
 # Auth Service
 
-**독립적이고 재사용 가능한 SSO 기반 인증/인가 서비스**
+Google OAuth 2.0 기반의 독립적이고 재사용 가능한 SSO 인증/인가 서비스
 
-[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![Node.js](https://img.shields.io/badge/node-%3E%3D18.0.0-brightgreen.svg)](https://nodejs.org/)
-[![TypeScript](https://img.shields.io/badge/typescript-%5E5.0.0-blue.svg)](https://www.typescriptlang.org/)
-[![React](https://img.shields.io/badge/react-18.x-blue.svg)](https://reactjs.org/)
+## 개요
 
-## 📋 개요
+개인 사이트의 과도한 사용 방지를 위한 인증 시스템으로, 다음과 같은 핵심 기능을 제공합니다:
 
-Auth Service는 Google OAuth 2.0 기반의 독립적인 인증 서비스로, Nginx `auth_request`를 통해 다양한 프로젝트에 쉽게 통합할 수 있습니다.
+- **Google OAuth 2.0 인증**: 구글 계정을 통한 간편 로그인
+- **관리자 승인 기반 접근 제어**: 신규 사용자는 관리자 승인 후 서비스 이용 가능
+- **JWT 토큰 기반 세션 관리**: HTTP-only 쿠키로 안전한 세션 유지
+- **Nginx auth_request 통합**: 기술 스택 독립적인 인증 게이트웨이
 
-### 주요 기능
-
-- ✅ **Google OAuth 2.0** 로그인
-- ✅ **관리자 승인 기반** 접근 제어
-- ✅ **JWT 기반 세션** 관리
-- ✅ **Nginx auth_request** 통합
-- ✅ **재사용 가능한 컴포넌트**
-- ✅ **Docker 지원**
-
-## 🏗️ 아키텍처
+## 시스템 아키텍처
 
 ```
-Internet → Nginx → Auth Service → Protected Services
-                      ↓
-                   PostgreSQL
+                            Internet
+                               │
+                               ▼
+                    ┌──────────────────┐
+                    │   Nginx Proxy    │
+                    │  (Port 443/80)   │
+                    └────────┬─────────┘
+                             │
+            ┌────────────────┼────────────────┐
+            │                │                │
+    ┌───────▼───────┐  ┌─────▼──────┐  ┌──────▼───────┐
+    │  Landing Page │  │Auth Service│  │   Services   │
+    │   (Public)    │  │            │  │  (Protected) │
+    └───────────────┘  └─────┬──────┘  └──────┬───────┘
+                             │                │
+                       ┌─────▼────┐           │
+                       │ Auth DB  │           │
+                       │PostgreSQL│           │
+                       └──────────┘           │
+                                              │
+                              auth_request ───┘
+                              (JWT Verify)
 ```
 
-- **Backend**: Node.js + Express + Passport.js
-- **Frontend**: React + TypeScript + Vite
-- **Database**: PostgreSQL 16
-- **인증**: Google OAuth 2.0 + JWT
+## 기술 스택
 
-## 🚀 빠른 시작
+| 구성요소 | 기술 | 버전 |
+|----------|------|------|
+| **Backend** | Node.js + Express + TypeScript | 18+ |
+| **Frontend** | React + TypeScript + Vite | 18.2 |
+| **Database** | PostgreSQL | 16 |
+| **Authentication** | Passport.js + JWT | - |
+| **API Docs** | Swagger/OpenAPI 3.0 | - |
 
-### 1. 서브모듈로 추가
+## 빠른 시작
+
+### 1. 환경 설정
+
+```bash
+# 저장소 클론
+git clone https://github.com/zerone6/auth-service.git
+cd auth-service
+
+# 환경변수 설정
+cp backend/.env.example backend/.env
+# backend/.env 파일 편집 (Google OAuth 설정 필수)
+```
+
+### 2. 개발 환경 실행
+
+```bash
+# Backend
+cd backend
+npm install
+npm run dev
+
+# Frontend (새 터미널)
+cd frontend
+npm install
+npm run dev
+```
+
+### 3. 접속
+
+- **Frontend**: http://localhost:5173/auth/login
+- **Backend API**: http://localhost:3000
+- **API 문서 (Swagger)**: http://localhost:3000/api-docs
+
+## 사용자 인증 플로우
+
+```
+1. 로그인 요청
+   User → /auth/login → "Continue with Google" 클릭
+
+2. OAuth 인증
+   → /auth/google → Google 로그인 페이지 → 콜백
+
+3. 상태별 리다이렉트
+   - pending  → 승인 대기 페이지
+   - approved → 메인 페이지
+   - rejected → 접근 거부 페이지
+```
+
+## 주요 API 엔드포인트
+
+| 경로 | 메소드 | 설명 |
+|------|--------|------|
+| `/auth/google` | GET | Google OAuth 시작 |
+| `/auth/me` | GET | 현재 사용자 정보 |
+| `/auth/logout` | POST | 로그아웃 |
+| `/verify` | GET | Nginx auth_request용 검증 |
+| `/admin/users` | GET | 사용자 목록 (관리자) |
+| `/admin/users/:id/approve` | POST | 사용자 승인 |
+| `/api-docs` | GET | Swagger UI |
+
+> 전체 API 문서는 `/api-docs` 또는 [BACKEND_STRUCTURE.md](docs/BACKEND_STRUCTURE.md) 참조
+
+## 프로젝트 구조
+
+```
+auth-service/
+├── backend/                 # Express 백엔드
+│   ├── src/
+│   │   ├── routes/         # API 라우트
+│   │   ├── middleware/     # 인증/에러 미들웨어
+│   │   ├── services/       # JWT, Passport
+│   │   ├── db/             # 데이터베이스 쿼리
+│   │   └── config/         # 환경설정, Swagger
+│   └── package.json
+│
+├── frontend/                # React 프론트엔드
+│   ├── src/
+│   │   ├── pages/          # 페이지 컴포넌트
+│   │   ├── components/     # 공통 컴포넌트
+│   │   └── config/         # OAuth 설정
+│   └── package.json
+│
+├── database/
+│   └── schema.sql          # DB 스키마
+│
+└── docs/                    # 상세 문서
+    ├── PROJECT_SUMMARY.md
+    ├── BACKEND_STRUCTURE.md
+    └── FRONTEND_STRUCTURE.md
+```
+
+## 환경변수
+
+주요 환경변수 (`backend/.env`):
+
+```env
+# Google OAuth (필수)
+GOOGLE_CLIENT_ID=your-client-id
+GOOGLE_CLIENT_SECRET=your-client-secret
+GOOGLE_CALLBACK_URL=http://localhost:3000/auth/google/callback
+
+# JWT
+JWT_SECRET=your-jwt-secret
+JWT_EXPIRES_IN=7d
+
+# Database
+DATABASE_URL=postgresql://user:password@localhost:5432/auth
+
+# 초기 관리자
+INITIAL_ADMIN_EMAIL=admin@example.com
+```
+
+> 전체 환경변수 목록은 [backend/.env.example](backend/.env.example) 참조
+
+## 테스트
+
+```bash
+cd backend
+
+npm test              # 테스트 실행
+npm run test:watch    # Watch 모드
+npm run test:coverage # 커버리지 리포트
+```
+
+**테스트 현황**: 44개 테스트 통과, 4개 스킵 (DB 통합 테스트)
+
+## Nginx 통합
+
+보호된 서비스에 인증 게이트웨이 적용:
+
+```nginx
+location /protected-service/ {
+    auth_request /auth/verify;
+    auth_request_set $auth_user_id $upstream_http_x_auth_user_id;
+    error_page 401 403 = @auth_redirect;
+
+    proxy_pass http://upstream-service;
+    proxy_set_header X-Auth-User-Id $auth_user_id;
+}
+
+location = /auth/verify {
+    internal;
+    proxy_pass http://auth-service/verify;
+    proxy_pass_request_body off;
+    proxy_set_header Cookie $http_cookie;
+}
+```
+
+## 상세 문서
+
+| 문서 | 내용 |
+|------|------|
+| [PROJECT_SUMMARY.md](docs/PROJECT_SUMMARY.md) | 전체 프로젝트 개요, 인증 플로우, DB 스키마 |
+| [BACKEND_STRUCTURE.md](docs/BACKEND_STRUCTURE.md) | 백엔드 구조, API 명세, 미들웨어, 테스트 |
+| [FRONTEND_STRUCTURE.md](docs/FRONTEND_STRUCTURE.md) | 프론트엔드 구조, 페이지별 설명, 스타일링 |
+
+## 다른 프로젝트에서 재사용
+
+### Git Submodule로 추가
 
 ```bash
 cd your-project
@@ -43,101 +215,28 @@ git submodule add https://github.com/zerone6/auth-service.git
 git submodule update --init --recursive
 ```
 
-### 2. 환경변수 설정
+### Docker Compose 통합
 
-```bash
-cd auth-service
-cp backend/.env.example backend/.env
-cp frontend/.env.example frontend/.env
+```yaml
+services:
+  auth-service:
+    build: ./auth-service/backend
+    environment:
+      - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
+      - DATABASE_URL=postgresql://auth_user:${AUTH_DB_PASSWORD}@auth-db:5432/auth
+    depends_on:
+      - auth-db
+
+  auth-db:
+    image: postgres:16-alpine
+    volumes:
+      - ./auth-service/database/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
 ```
 
-`backend/.env` 파일 수정:
-```env
-GOOGLE_CLIENT_ID=your_google_client_id
-GOOGLE_CLIENT_SECRET=your_google_client_secret
-GOOGLE_CALLBACK_URL=https://your-domain.com/auth/google/callback
-JWT_SECRET=your_strong_secret_key
-DATABASE_URL=postgresql://user:password@auth-db:5432/auth
-INITIAL_ADMIN_EMAIL=your_email@gmail.com
-```
+## 라이선스
 
-### 3. Docker Compose로 실행
-
-```bash
-docker compose up -d
-```
-
-### 4. Nginx 설정
-
-```nginx
-# auth_request 추가
-location /protected/ {
-    auth_request /auth-verify;
-    # ... 나머지 설정
-}
-
-location = /auth-verify {
-    internal;
-    proxy_pass http://auth-backend:3000/verify;
-}
-```
-
-## 📁 프로젝트 구조
-
-```
-auth-service/
-├── backend/          # Node.js 인증 백엔드
-├── frontend/         # React 관리자 대시보드
-├── database/         # PostgreSQL 스키마
-├── docs/            # 문서
-└── docker-compose.yml
-```
-
-## 📖 문서
-
-- [📋 개발 계획서](docs/AUTH-DEV-PLAN.md)
-- [🏗️ 아키텍처](docs/ARCHITECTURE.md)
-- [🔌 API 명세](docs/API.md)
-- [🔧 통합 가이드](docs/INTEGRATION.md)
-- [🚀 배포 가이드](docs/DEPLOYMENT.md)
-
-## 🔐 보안
-
-- HttpOnly + Secure + SameSite Cookie
-- JWT 토큰 기반 인증
-- HTTPS 강제
-- SQL Injection 방지
-- XSS/CSRF 방지
-
-## 📊 개발 상태
-
-### Phase 1: 초기 설정 ✅
-- [x] 프로젝트 구조 생성
-- [x] 설계 문서 작성
-
-### Phase 2-10: 개발 중 🚧
-자세한 로드맵은 [AUTH-DEV-PLAN.md](docs/AUTH-DEV-PLAN.md)를 참조하세요.
-
-## 🤝 기여
-
-이 프로젝트는 개인 프로젝트이지만, 이슈와 제안은 언제나 환영합니다!
-
-1. Fork the Project
-2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the Branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
-
-## 📄 라이선스
-
-Private - Personal use only
-
-## 📞 Contact
-
-- **Developer**: zerone6
-- **Repository**: https://github.com/zerone6/auth-service
-- **Issues**: https://github.com/zerone6/auth-service/issues
+MIT License
 
 ---
 
-**Made with ❤️ for secure authentication**
+**Last Updated**: 2025-12-28

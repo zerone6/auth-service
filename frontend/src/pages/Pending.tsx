@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import './Pending.css';
+import styles from './Pending.module.css';
 
 const Pending: React.FC = () => {
   const navigate = useNavigate();
@@ -12,19 +12,19 @@ const Pending: React.FC = () => {
   };
 
   return (
-    <div className="pending-container">
-      <div className="pending-card">
-        <div className="pending-icon">⏳</div>
+    <div className={styles.pendingContainer}>
+      <div className={styles.pendingCard}>
+        <div className={styles.pendingIcon}>⏳</div>
         <h1>승인 대기 중</h1>
-        <p className="pending-message">
+        <p className={styles.pendingMessage}>
           계정이 성공적으로 생성되었습니다!
         </p>
-        <p className="pending-description">
+        <p className={styles.pendingDescription}>
           관리자의 승인을 기다려주세요.
           계정 승인 시 이메일로 알림을 받으실 수 있습니다.
         </p>
 
-        <div className="pending-info">
+        <div className={styles.pendingInfo}>
           <h3>다음 단계</h3>
           <ul>
             <li>관리자가 요청을 검토합니다</li>
@@ -33,7 +33,7 @@ const Pending: React.FC = () => {
           </ul>
         </div>
 
-        <button className="logout-button" onClick={handleLogout}>
+        <button className={styles.logoutButton} onClick={handleLogout}>
           로그아웃
         </button>
       </div>

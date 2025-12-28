@@ -1,4 +1,4 @@
-.rejected-container {
+.pendingContainer {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -7,7 +7,7 @@
   background: linear-gradient(to bottom right, #6366f1, #a855f7, #9333ea);
 }
 
-.rejected-card {
+.pendingCard {
   background: white;
   border-radius: 16px;
   padding: 48px;
@@ -17,66 +17,76 @@
   text-align: center;
 }
 
-.rejected-icon {
+.pendingIcon {
   font-size: 80px;
   margin-bottom: 24px;
-  animation: shake 0.5s;
+  animation: pulse 2s infinite;
 }
 
-@keyframes shake {
+@keyframes pulse {
   0%, 100% {
-    transform: translateX(0);
+    transform: scale(1);
   }
-  10%, 30%, 50%, 70%, 90% {
-    transform: translateX(-10px);
-  }
-  20%, 40%, 60%, 80% {
-    transform: translateX(10px);
+  50% {
+    transform: scale(1.1);
   }
 }
 
-.rejected-card h1 {
+.pendingCard h1 {
   font-size: 32px;
   margin-bottom: 16px;
   color: #333;
 }
 
-.rejected-message {
+.pendingMessage {
   font-size: 18px;
   color: #666;
-  margin-bottom: 16px;
+  margin-bottom: 24px;
 }
 
-.rejected-description {
+.pendingDescription {
   font-size: 14px;
   color: #888;
   line-height: 1.6;
   margin-bottom: 32px;
 }
 
-.rejected-info {
-  background: #fff3f3;
-  border-left: 4px solid #eb3349;
+.pendingInfo {
+  background: #f8f9fa;
   border-radius: 8px;
   padding: 24px;
   margin-bottom: 32px;
   text-align: left;
 }
 
-.rejected-info h3 {
+.pendingInfo h3 {
   font-size: 18px;
-  margin-bottom: 12px;
-  color: #eb3349;
+  margin-bottom: 16px;
+  color: #333;
 }
 
-.rejected-info p {
+.pendingInfo ul {
+  list-style: none;
+  padding: 0;
+}
+
+.pendingInfo li {
+  padding: 8px 0;
+  padding-left: 28px;
+  position: relative;
   color: #666;
   font-size: 14px;
-  line-height: 1.6;
-  margin: 0;
 }
 
-.logout-button {
+.pendingInfo li::before {
+  content: '\2713';
+  position: absolute;
+  left: 0;
+  color: #ffa751;
+  font-weight: bold;
+}
+
+.logoutButton {
   background-color: #666;
   color: white;
   border: none;
@@ -87,52 +97,51 @@
   transition: background-color 0.2s;
 }
 
-.logout-button:hover {
+.logoutButton:hover {
   background-color: #555;
   border-color: transparent;
 }
 
 @media (prefers-color-scheme: dark) {
-  .rejected-card {
+  .pendingCard {
     background: #1a1a1a;
   }
 
-  .rejected-card h1 {
+  .pendingCard h1 {
     color: #fff;
   }
 
-  .rejected-message {
+  .pendingMessage {
     color: #aaa;
   }
 
-  .rejected-description {
+  .pendingDescription {
     color: #888;
   }
 
-  .rejected-info {
-    background: #2a1a1a;
-    border-left-color: #f45c43;
+  .pendingInfo {
+    background: #2a2a2a;
   }
 
-  .rejected-info h3 {
-    color: #f45c43;
+  .pendingInfo h3 {
+    color: #fff;
   }
 
-  .rejected-info p {
+  .pendingInfo li {
     color: #aaa;
   }
 }
 
 @media (max-width: 640px) {
-  .rejected-card {
+  .pendingCard {
     padding: 32px 24px;
   }
 
-  .rejected-icon {
+  .pendingIcon {
     font-size: 60px;
   }
 
-  .rejected-card h1 {
+  .pendingCard h1 {
     font-size: 24px;
   }
 }

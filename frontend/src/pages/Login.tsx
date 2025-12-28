@@ -2,7 +2,7 @@ import React from 'react';
 import { oauthProviders } from '../config/oauthProviders';
 import OAuthProviderButton from '../components/OAuthProviderButton';
 import { OAuthProviderConfig } from '../types/auth';
-import './Login.css';
+import styles from './Login.module.css';
 
 const Login: React.FC = () => {
 
@@ -14,14 +14,14 @@ const Login: React.FC = () => {
   };
 
   return (
-    <div className="login-container">
-      <div className="login-card">
-        <div className="login-header">
+    <div className={styles.loginContainer}>
+      <div className={styles.loginCard}>
+        <div className={styles.loginHeader}>
           <h1>로그인 선택</h1>
           <p>원하시는 계정으로 로그인해주세요</p>
         </div>
 
-        <div className="oauth-providers">
+        <div className={styles.oauthProviders}>
           {oauthProviders.map((provider) => (
             <OAuthProviderButton
               key={provider.id}

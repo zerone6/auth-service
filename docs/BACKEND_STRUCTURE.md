@@ -24,7 +24,8 @@ backend/
 │   │   └── admin.ts             # 관리자 API
 │   │
 │   ├── middleware/
-│   │   └── auth.ts              # 인증 미들웨어
+│   │   ├── auth.ts              # 인증 미들웨어
+│   │   └── errorHandler.ts      # 중앙 집중식 에러 핸들러
 │   │
 │   ├── services/
 │   │   ├── jwt.ts               # JWT 토큰 관리
@@ -112,6 +113,55 @@ Nginx auth_request 지시어용 엔드포인트
 **토큰 위치 우선순위**:
 1. Cookie: `auth_token`
 2. Header: `Authorization: Bearer <token>`
+
+### 에러 핸들러 미들웨어 (`src/middleware/errorHandler.ts`)
+
+중앙 집중식 에러 처리를 위한 미들웨어 및 유틸리티.
+
+**에러 클래스 계층구조**:
+
+| 클래스 | HTTP 상태 | 코드 | 용도 |
+|--------|----------|------|------|
+| `AppError` | - | - | 기본 에러 클래스 |
+| `UnauthorizedError` | 401 | UNAUTHORIZED | 인증 필요 |
+| `ForbiddenError` | 403 | FORBIDDEN | 접근 거부 |
+| `NotFoundError` | 404 | NOT_FOUND | 리소스 없음 |
+| `BadRequestError` | 400 | BAD_REQUEST | 잘못된 요청 |
+| `ValidationError` | 422 | VALIDATION_ERROR | 유효성 검사 실패 |
+| `ConflictError` | 409 | CONFLICT | 리소스 충돌 |
+| `InternalError` | 500 | INTERNAL_ERROR | 내부 서버 오류 |
+
+**유틸리티 함수**:
+
+| 함수 | 용도 |
+|------|------|
+| `asyncHandler(fn)` | async 라우트 핸들러 래퍼 (에러 자동 catch) |
+| `errorHandler(err, req, res, next)` | 중앙 집중식 에러 핸들러 |
+| `notFoundHandler(req, res, next)` | 404 Not Found 핸들러 |
+| `sendSuccess(res, data, statusCode)` | 표준화된 성공 응답 헬퍼 |
+
+**표준 API 응답 형식**:
+
+```typescript
+// 성공 응답
+{
+  success: true,
+  data: { ... },
+  timestamp: "2025-12-28T12:00:00.000Z"
+}
+
+// 에러 응답
+{
+  success: false,
+  error: {
+    code: "NOT_FOUND",
+    message: "User not found",
+    details?: { ... }  // development 환경에서만
+  },
+  timestamp: "2025-12-28T12:00:00.000Z",
+  path: "/admin/users/123"
+}
+```
 
 ---
 
@@ -225,6 +275,13 @@ Nginx auth_request 지시어용 엔드포인트
 | `INITIAL_ADMIN_EMAIL` | 초기 관리자 이메일 |
 | `FRONTEND_URL` | 프론트엔드 URL |
 | `ALLOWED_ORIGINS` | CORS 허용 Origin (쉼표 구분) |
+| `AUTH_DB_PASSWORD` | PostgreSQL 비밀번호 (Docker Compose용) |
+
+### 환경변수 파일
+
+모든 환경변수는 `backend/.env.example`에 통합되어 있습니다:
+- Backend 설정: Google OAuth, JWT, Session, Database 등
+- Docker Compose 설정: `AUTH_DB_PASSWORD`
 
 ### 환경변수 예시
 
@@ -400,30 +457,113 @@ docker run -p 3000:3000 --env-file .env auth-backend
 
 ---
 
+## TypeScript 설정
+
+### tsconfig.json 주요 설정
+
+```json
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "CommonJS",
+    "moduleResolution": "Node10",
+    "strict": true,
+    "strictNullChecks": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true
+  }
+}
+```
+
+### Express 타입 확장 (`src/types/express.d.ts`)
+
+```typescript
+interface User {
+  // From JwtPayload (set by requireAuth middleware)
+  userId?: number;
+  email: string;
+  role: 'admin' | 'user';
+  status: 'pending' | 'approved' | 'rejected';
+  // From DbUser (set by Passport)
+  id?: number;
+  google_id?: string;
+  name?: string | null;
+  picture_url?: string | null;
+  // ... timestamps
+}
+```
+
+---
+
+## 테스트
+
+### 테스트 환경
+
+| 항목 | 설정 |
+|------|------|
+| 테스트 프레임워크 | Jest + ts-jest |
+| HTTP 테스트 | Supertest |
+| 커버리지 | Istanbul (jest --coverage) |
+
+### 테스트 실행
+
+```bash
+npm test           # 테스트 실행
+npm run test:watch # Watch 모드
+npm run test:coverage # 커버리지 리포트
+```
+
+### 테스트 결과 요약
+
+| 테스트 파일 | 테스트 케이스 | 상태 |
+|-------------|---------------|------|
+| jwt.test.ts | 11개 | ✅ Pass |
+| auth.test.ts (middleware) | 15개 | ✅ Pass |
+| health.test.ts | 4개 | ✅ Pass |
+| verify.test.ts | 10개 | ✅ Pass |
+| auth.test.ts (routes) | 4개 (+ 4 skipped) | ✅ Pass |
+| **총계** | **44개 (+ 4 skipped)** | **100% Pass** |
+
+---
+
+## API 문서화 (Swagger/OpenAPI)
+
+### 접근 방법
+
+개발 환경에서 Swagger UI를 통해 API 문서를 확인할 수 있습니다:
+
+```
+http://localhost:3000/api-docs
+```
+
+OpenAPI 3.0 JSON 스펙:
+```
+http://localhost:3000/api-docs.json
+```
+
+### 구성 파일
+
+| 파일 | 설명 |
+|------|------|
+| `src/config/swagger.ts` | OpenAPI 스펙 설정 (스키마, 보안, 태그 등) |
+| `src/routes/*.ts` | JSDoc 주석으로 API 명세 정의 |
+
+### 사용된 패키지
+
+| 패키지 | 용도 |
+|--------|------|
+| swagger-jsdoc | JSDoc 주석에서 OpenAPI 스펙 생성 |
+| swagger-ui-express | Swagger UI 호스팅 |
+
+---
+
 ## TODO: 코드 레벨 개선 필요 항목
 
-### 우선순위 높음 (P0)
+### 완료된 항목 ✅
 
-#### @ts-nocheck 제거
-
-현재 TypeScript 타입 검사가 비활성화된 파일들:
-
-| 파일 | 조치 필요 |
-|------|----------|
-| `src/server.ts` | 타입 오류 수정 후 @ts-nocheck 제거 |
-| `src/routes/auth.ts` | 타입 오류 수정 후 @ts-nocheck 제거 |
-| `src/routes/admin.ts` | 타입 오류 수정 후 @ts-nocheck 제거 |
-| `src/routes/verify.ts` | 타입 오류 수정 후 @ts-nocheck 제거 |
-
-### 우선순위 중간 (P1)
-
-- 공통 에러 핸들러 미들웨어 강화
-- 표준화된 에러 응답 형식 적용
-
-### 우선순위 낮음 (P2)
-
-- Jest 테스트 설정 및 테스트 코드 작성
-- Swagger/OpenAPI 문서 추가
+- ~~공통 에러 핸들러 미들웨어 강화~~ (2025-12-28)
+- ~~표준화된 에러 응답 형식 적용~~ (2025-12-28)
+- ~~Swagger/OpenAPI 문서 추가~~ (2025-12-28)
 
 ---
 

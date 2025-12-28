@@ -1,24 +1,37 @@
-// @ts-nocheck
 import express, { Request, Response } from 'express';
 import helmet from 'helmet';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import passport from 'passport';
 import session from 'express-session';
+import swaggerUi from 'swagger-ui-express';
 import { config } from './config';
+import { swaggerSpec } from './config/swagger';
 import { testConnection } from './db/connection';
 import { configurePassport } from './services/passport';
 import authRoutes from './routes/auth';
 import verifyRoutes from './routes/verify';
 import adminRoutes from './routes/admin';
+import { errorHandler, notFoundHandler } from './middleware/errorHandler';
 
 const app = express();
 
 // Configure Passport
 configurePassport();
 
-// Security middleware
-app.use(helmet());
+// Security middleware (CSP 설정을 Swagger UI가 작동하도록 조정)
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        styleSrc: ["'self'", "'unsafe-inline'"],
+        scriptSrc: ["'self'", "'unsafe-inline'"],
+        imgSrc: ["'self'", 'data:', 'https:'],
+      },
+    },
+  })
+);
 app.use(cors({
   origin: config.cors.origins,
   credentials: true,
@@ -65,27 +78,28 @@ app.get('/db/health', async (req: Request, res: Response) => {
   });
 });
 
+// Swagger UI (API Documentation)
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
+  customCss: '.swagger-ui .topbar { display: none }',
+  customSiteTitle: 'Auth Service API Docs',
+}));
+
+// Swagger JSON endpoint
+app.get('/api-docs.json', (req: Request, res: Response) => {
+  res.setHeader('Content-Type', 'application/json');
+  res.send(swaggerSpec);
+});
+
 // API Routes
 app.use('/auth', authRoutes);
 app.use('/verify', verifyRoutes);
 app.use('/admin', adminRoutes);
 
 // 404 handler
-app.use((req: Request, res: Response) => {
-  res.status(404).json({
-    error: 'Not Found',
-    message: `Cannot ${req.method} ${req.path}`,
-  });
-});
+app.use(notFoundHandler);
 
-// Error handler
-app.use((err: Error, req: Request, res: Response, next: Function) => {
-  console.error('Error:', err);
-  res.status(500).json({
-    error: 'Internal Server Error',
-    message: config.nodeEnv === 'development' ? err.message : 'Something went wrong',
-  });
-});
+// Centralized error handler
+app.use(errorHandler);
 
 // Start server
 async function startServer() {
@@ -110,6 +124,7 @@ async function startServer() {
 ║   Endpoints:                                              ║
 ║   - GET  /health              (Health check)             ║
 ║   - GET  /db/health           (Database health)          ║
+║   - GET  /api-docs            (Swagger UI)               ║
 ║   - GET  /auth/google         (Google OAuth login)       ║
 ║   - GET  /verify              (Nginx auth_request)       ║
 ║   - GET  /admin/*             (Admin API)                ║

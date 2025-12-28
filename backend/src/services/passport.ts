@@ -1,4 +1,3 @@
-// @ts-nocheck
 import passport from 'passport';
 import { Strategy as GoogleStrategy, Profile, VerifyCallback } from 'passport-google-oauth20';
 import { config } from '../config';
@@ -42,19 +41,19 @@ export function configurePassport() {
 
           if (user) {
             // Update existing user profile (name and picture may have changed)
-            user = await updateUserProfile(user.id, name, pictureUrl);
+            user = await updateUserProfile(user.id, name, pictureUrl ?? null);
           } else {
             // Create new user
             user = await createUser(
               googleId,
               email,
               name,
-              pictureUrl,
+              pictureUrl ?? null,
               config.initialAdmin.email
             );
           }
 
-          return done(null, user);
+          return done(null, user ?? undefined);
         } catch (error) {
           return done(error as Error);
         }
@@ -63,8 +62,8 @@ export function configurePassport() {
   );
 
   // Serialize user to session
-  passport.serializeUser((user: any, done) => {
-    done(null, user.id);
+  passport.serializeUser((user: Express.User, done) => {
+    done(null, (user as User).id);
   });
 
   // Deserialize user from session
@@ -72,9 +71,9 @@ export function configurePassport() {
     try {
       const { findUserById } = await import('../db/queries');
       const user = await findUserById(id);
-      done(null, user);
+      done(null, user ?? undefined);
     } catch (error) {
-      done(error);
+      done(error as Error);
     }
   });
 }

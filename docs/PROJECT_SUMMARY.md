@@ -25,18 +25,18 @@
                                  │
                 ┌────────────────┼────────────────┐
                 │                │                │
-        ┌───────▼───────┐ ┌─────▼──────┐ ┌──────▼───────┐
-        │  Landing Page │ │Auth Service│ │   Services   │
-        │   (Public)    │ │            │ │  (Protected) │
-        └───────────────┘ └─────┬──────┘ └──────┬───────┘
-                                │                │
-                          ┌─────▼────┐          │
-                          │ Auth DB  │          │
-                          │PostgreSQL│          │
-                          └──────────┘          │
-                                                │
-                                auth_request ───┘
-                                (JWT Verify)
+        ┌───────▼───────┐  ┌─────▼──────┐  ┌──────▼───────┐
+        │  Landing Page │  │Auth Service│  │   Services   │
+        │   (Public)    │  │            │  │  (Protected) │
+        └───────────────┘  └─────┬──────┘  └──────┬───────┘
+                                 │                │
+                           ┌─────▼────┐           │
+                           │ Auth DB  │           │
+                           │PostgreSQL│           │
+                           └──────────┘           │
+                                                  │
+                                  auth_request ───┘
+                                  (JWT Verify)
 ```
 
 ---
@@ -46,7 +46,7 @@
 | 서비스 | 역할 | 기술 스택 | 포트 |
 |--------|------|-----------|------|
 | **Auth Backend** | OAuth 처리, JWT 발급/검증, 사용자 관리 | Node.js + Express + Passport.js | 3000 |
-| **Auth Frontend** | 로그인 UI, 관리자 대시보드 | React + TypeScript + Vite | 5173 |
+| **Auth Frontend** | 로그인 UI, 관리자 대시보드 | React + TypeScript + Vite + CSS Modules | 5173 |
 | **Auth Database** | 사용자 정보, 세션 저장 | PostgreSQL 16 | 5432 |
 | **Nginx** | Reverse Proxy, auth_request 처리 | Nginx Alpine | 80/443 |
 
@@ -63,21 +63,23 @@ auth-service/
 │   │   │   ├── verify.ts      # 검증 API (Nginx auth_request)
 │   │   │   └── admin.ts       # 관리자 API
 │   │   ├── middleware/        # Express 미들웨어
+│   │   │   ├── auth.ts        # 인증 미들웨어
+│   │   │   └── errorHandler.ts # 중앙 집중식 에러 핸들러
 │   │   ├── services/          # 비즈니스 로직
 │   │   ├── db/                # 데이터베이스 관련
 │   │   │   ├── connection.ts  # DB 연결
 │   │   │   └── queries.ts     # 인증 쿼리
 │   │   ├── config/            # 환경변수 설정
 │   │   └── server.ts          # Express 서버 진입점
-│   ├── run-migration.js       # 마이그레이션 실행 스크립트
+│   ├── .env.example           # 환경변수 예시 (Backend + Docker)
 │   ├── package.json
 │   ├── tsconfig.json
 │   └── Dockerfile
 │
-├── frontend/                   # 인증 UI (React + Vite)
+├── frontend/                   # 인증 UI (React + Vite + CSS Modules)
 │   ├── src/
-│   │   ├── components/        # React 컴포넌트
-│   │   ├── pages/             # 페이지 컴포넌트
+│   │   ├── components/        # React 컴포넌트 (CSS Modules)
+│   │   ├── pages/             # 페이지 컴포넌트 (CSS Modules)
 │   │   ├── config/            # 설정 파일
 │   │   ├── types/             # TypeScript 타입
 │   │   ├── App.tsx
@@ -211,9 +213,115 @@ location @auth_redirect {
 - 환경변수 `INITIAL_ADMIN_EMAIL`로 설정된 이메일로 첫 로그인 시
 - 자동으로 `role: admin`, `status: approved` 부여
 
+### 표준 API 응답 형식
+
+모든 API 응답은 표준화된 형식을 따릅니다:
+
+**성공 응답**:
+```json
+{
+  "success": true,
+  "data": { ... },
+  "timestamp": "2025-12-28T12:00:00.000Z"
+}
+```
+
+**에러 응답**:
+```json
+{
+  "success": false,
+  "error": {
+    "code": "NOT_FOUND",
+    "message": "User not found"
+  },
+  "timestamp": "2025-12-28T12:00:00.000Z",
+  "path": "/admin/users/123"
+}
+```
+
+### API 문서화 (Swagger)
+
+개발 환경에서 Swagger UI를 통해 대화형 API 문서를 확인할 수 있습니다:
+
+- **Swagger UI**: `http://localhost:3000/api-docs`
+- **OpenAPI JSON**: `http://localhost:3000/api-docs.json`
+
+---
+
+## 테스트
+
+### 테스트 환경
+
+| 항목 | 설정 |
+|------|------|
+| 테스트 프레임워크 | Jest + ts-jest |
+| HTTP 테스트 | Supertest |
+| 커버리지 | Istanbul (jest --coverage) |
+
+### 테스트 실행
+
+```bash
+cd backend
+
+# 테스트 실행
+npm test
+
+# Watch 모드
+npm run test:watch
+
+# 커버리지 리포트
+npm run test:coverage
+```
+
+### 테스트 구조
+
+```
+backend/src/__tests__/
+├── setup.ts                      # 테스트 환경 설정
+├── services/
+│   └── jwt.test.ts               # JWT 서비스 단위 테스트
+├── middleware/
+│   └── auth.test.ts              # 인증 미들웨어 단위 테스트
+└── routes/
+    ├── health.test.ts            # 헬스체크 엔드포인트 테스트
+    ├── verify.test.ts            # 검증 API 통합 테스트
+    └── auth.test.ts              # 인증 API 테스트
+```
+
+### 테스트 결과 요약
+
+| 테스트 파일 | 테스트 케이스 | 상태 |
+|-------------|---------------|------|
+| jwt.test.ts | 11개 | ✅ Pass |
+| auth.test.ts (middleware) | 15개 | ✅ Pass |
+| health.test.ts | 4개 | ✅ Pass |
+| verify.test.ts | 10개 | ✅ Pass |
+| auth.test.ts (routes) | 4개 (+ 4 skipped) | ✅ Pass |
+| **총계** | **44개 (+ 4 skipped)** | **100% Pass** |
+
+### 테스트 범위
+
+#### 단위 테스트
+
+- **JWT 서비스**: 토큰 생성, 검증, 페이로드 구조 검증
+- **인증 미들웨어**: requireAuth, requireAdmin, requireApproved, optionalAuth
+
+#### 통합 테스트
+
+- **헬스체크**: /health, /db/health 엔드포인트
+- **검증 API**: /verify (Nginx auth_request용), /verify/admin
+- **인증 API**: /auth/failure, /auth/logout
+
+#### 스킵된 테스트 (DB 필요)
+
+- /auth/me, /auth/status 엔드포인트 (동적 import로 인한 mock 제한)
+- 이 테스트들은 실제 DB 연결이 필요한 통합 테스트 환경에서 실행
+
 ---
 
 ## 환경변수
+
+모든 환경변수는 `backend/.env.example`에 통합되어 있습니다.
 
 ### 필수 환경변수
 
@@ -241,6 +349,9 @@ FRONTEND_URL=https://your-domain.com
 
 # CORS
 ALLOWED_ORIGINS=https://your-domain.com
+
+# Docker Compose
+AUTH_DB_PASSWORD=<openssl rand -base64 32로 생성>
 ```
 
 ---

@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { oauthProviders } from '../config/oauthProviders';
 import OAuthProviderButton from '../components/OAuthProviderButton';
 import { OAuthProviderConfig } from '../types/auth';
-import './SignUp.css';
+import styles from './SignUp.module.css';
 
 const SignUp: React.FC = () => {
   const navigate = useNavigate();
@@ -16,14 +16,14 @@ const SignUp: React.FC = () => {
   };
 
   return (
-    <div className="signup-container">
-      <div className="signup-card">
-        <div className="signup-header">
+    <div className={styles.signupContainer}>
+      <div className={styles.signupCard}>
+        <div className={styles.signupHeader}>
           <h1>📝 Sign Up</h1>
           <p>Create a new account with your preferred method</p>
         </div>
 
-        <div className="oauth-providers">
+        <div className={styles.oauthProviders}>
           {oauthProviders.map((provider) => (
             <OAuthProviderButton
               key={provider.id}
@@ -33,11 +33,11 @@ const SignUp: React.FC = () => {
           ))}
         </div>
 
-        <div className="signup-footer">
+        <div className={styles.signupFooter}>
           <p>
             Already have an account?{' '}
             <button
-              className="link-button"
+              className={styles.linkButton}
               onClick={() => navigate('/login')}
             >
               Sign In

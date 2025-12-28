@@ -1,4 +1,4 @@
-.signup-container {
+.signupContainer {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -7,7 +7,7 @@
   background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
 }
 
-.signup-card {
+.signupCard {
   background: white;
   border-radius: 16px;
   padding: 40px;
@@ -16,63 +16,84 @@
   width: 100%;
 }
 
-.signup-header {
+.signupHeader {
   text-align: center;
   margin-bottom: 32px;
 }
 
-.signup-header h1 {
+.signupHeader h1 {
   font-size: 32px;
   margin-bottom: 8px;
   color: #333;
 }
 
-.signup-header p {
+.signupHeader p {
   color: #666;
   font-size: 14px;
 }
 
-.signup-footer {
+.oauthProviders {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.signupFooter {
   margin-top: 32px;
   text-align: center;
   padding-top: 24px;
   border-top: 1px solid #eee;
 }
 
-.signup-footer p {
+.signupFooter p {
   color: #666;
   font-size: 14px;
 }
 
+.linkButton {
+  background: none;
+  border: none;
+  color: #9333ea;
+  text-decoration: underline;
+  cursor: pointer;
+  padding: 0;
+  font-size: 14px;
+}
+
+.linkButton:hover {
+  color: #7c3aed;
+  border: none;
+}
+
 @media (prefers-color-scheme: dark) {
-  .signup-card {
+  .signupCard {
     background: #1a1a1a;
     color: #fff;
   }
 
-  .signup-header h1 {
+  .signupHeader h1 {
     color: #fff;
   }
 
-  .signup-header p {
+  .signupHeader p {
     color: #aaa;
   }
 
-  .signup-footer p {
+  .signupFooter p {
     color: #aaa;
   }
 
-  .signup-footer {
+  .signupFooter {
     border-top-color: #333;
   }
 }
 
 @media (max-width: 640px) {
-  .signup-card {
+  .signupCard {
     padding: 24px;
   }
 
-  .signup-header h1 {
+  .signupHeader h1 {
     font-size: 24px;
   }
 }

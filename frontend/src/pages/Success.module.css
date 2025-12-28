@@ -1,5 +1,5 @@
 /* Page Layout */
-.success-page {
+.successPage {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -7,14 +7,14 @@
 }
 
 /* Header */
-.success-header {
+.successHeader {
   background: rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(10px);
   border-bottom: 1px solid rgba(255, 255, 255, 0.2);
   padding: 16px 0;
 }
 
-.header-container {
+.headerContainer {
   max-width: 1200px;
   margin: 0 auto;
   padding: 0 20px;
@@ -23,7 +23,7 @@
   align-items: center;
 }
 
-.success-header h1 {
+.successHeader h1 {
   color: white;
   font-size: 1.5rem;
   font-weight: 600;
@@ -31,11 +31,11 @@
 }
 
 /* Profile Menu */
-.profile-menu {
+.profileMenu {
   position: relative;
 }
 
-.profile-button {
+.profileButton {
   background: none;
   border: none;
   cursor: pointer;
@@ -62,7 +62,7 @@
 }
 
 /* Dropdown Menu */
-.dropdown-menu {
+.dropdownMenu {
   position: absolute;
   top: calc(100% + 8px);
   right: 0;
@@ -74,14 +74,14 @@
   overflow: hidden;
 }
 
-.dropdown-header {
+.dropdownHeader {
   padding: 16px;
   display: flex;
   align-items: center;
   gap: 12px;
 }
 
-.dropdown-avatar {
+.dropdownAvatar {
   width: 48px;
   height: 48px;
   border-radius: 50%;
@@ -95,12 +95,12 @@
   flex-shrink: 0;
 }
 
-.dropdown-info {
+.dropdownInfo {
   flex: 1;
   min-width: 0;
 }
 
-.dropdown-email {
+.dropdownEmail {
   font-size: 0.875rem;
   font-weight: 500;
   color: #1f2937;
@@ -110,7 +110,7 @@
   text-overflow: ellipsis;
 }
 
-.dropdown-badge {
+.dropdownBadge {
   display: inline-block;
   padding: 2px 8px;
   border-radius: 12px;
@@ -118,22 +118,22 @@
   font-weight: 500;
 }
 
-.dropdown-badge.admin {
+.dropdownBadgeAdmin {
   background-color: #fef3c7;
   color: #92400e;
 }
 
-.dropdown-badge.user {
+.dropdownBadgeUser {
   background-color: #e5e7eb;
   color: #6b7280;
 }
 
-.dropdown-divider {
+.dropdownDivider {
   height: 1px;
   background: #e5e7eb;
 }
 
-.dropdown-item {
+.dropdownItem {
   width: 100%;
   padding: 12px 16px;
   background: none;
@@ -148,11 +148,11 @@
   text-align: left;
 }
 
-.dropdown-item:hover {
+.dropdownItem:hover {
   background-color: #f3f4f6;
 }
 
-.dropdown-icon {
+.dropdownIcon {
   font-size: 1.125rem;
   width: 20px;
   display: flex;
@@ -161,18 +161,18 @@
 }
 
 /* Main Content */
-.success-main {
+.successMain {
   flex: 1;
   padding: 40px 20px;
 }
 
-.success-container {
+.successContainer {
   max-width: 1200px;
   margin: 0 auto;
 }
 
 /* Services Grid */
-.services-grid {
+.servicesGrid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: 24px;
@@ -180,7 +180,7 @@
   margin: 0 auto;
 }
 
-.service-card {
+.serviceCard {
   background: white;
   border-radius: 12px;
   padding: 24px;
@@ -194,22 +194,22 @@
   color: inherit;
 }
 
-.service-card:hover {
+.serviceCard:hover {
   transform: translateY(-4px);
   box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
 }
 
-.service-card.disabled {
+.serviceCardDisabled {
   opacity: 0.5;
   cursor: not-allowed;
 }
 
-.service-card.disabled:hover {
+.serviceCardDisabled:hover {
   transform: none;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
 }
 
-.service-icon {
+.serviceIcon {
   width: 64px;
   height: 64px;
   border-radius: 12px;
@@ -220,15 +220,15 @@
   flex-shrink: 0;
 }
 
-.service-icon.calendar {
+.serviceIconCalendar {
   background: #fee2e2;
 }
 
-.service-icon.home {
+.serviceIconHome {
   background: #fce7f3;
 }
 
-.service-content h2 {
+.serviceContent h2 {
   color: #3b82f6;
   font-size: 1.125rem;
   font-weight: 600;
@@ -236,7 +236,7 @@
   line-height: 1.4;
 }
 
-.service-content p {
+.serviceContent p {
   color: #60a5fa;
   font-size: 1rem;
   margin: 0;
@@ -244,7 +244,7 @@
 }
 
 /* Login Card (unauthenticated state) */
-.login-card {
+.loginCard {
   background: white;
   border-radius: 16px;
   padding: 60px 40px;
@@ -253,20 +253,20 @@
   text-align: center;
 }
 
-.login-card h2 {
+.loginCard h2 {
   color: #1f2937;
   font-size: 1.875rem;
   font-weight: 600;
   margin-bottom: 12px;
 }
 
-.login-card p {
+.loginCard p {
   color: #6b7280;
   margin-bottom: 32px;
   font-size: 1.125rem;
 }
 
-.login-button {
+.loginButton {
   background: white;
   color: #9333ea;
   border: none;
@@ -281,14 +281,14 @@
   transition: all 0.2s;
 }
 
-.login-button:hover {
+.loginButton:hover {
   background: rgba(255, 255, 255, 0.9);
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 /* Footer */
-.success-footer {
+.successFooter {
   background: rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(10px);
   border-top: 1px solid rgba(255, 255, 255, 0.2);
@@ -296,7 +296,7 @@
   text-align: center;
 }
 
-.success-footer p {
+.successFooter p {
   color: rgba(255, 255, 255, 0.8);
   font-size: 0.875rem;
   margin: 0;
@@ -304,39 +304,39 @@
 
 /* Dark Mode */
 @media (prefers-color-scheme: dark) {
-  .dropdown-menu {
+  .dropdownMenu {
     background: #1a1a1a;
   }
 
-  .dropdown-email {
+  .dropdownEmail {
     color: #fff;
   }
 
-  .dropdown-divider {
+  .dropdownDivider {
     background: #333;
   }
 
-  .dropdown-item {
+  .dropdownItem {
     color: #e5e7eb;
   }
 
-  .dropdown-item:hover {
+  .dropdownItem:hover {
     background-color: #2a2a2a;
   }
 }
 
 /* Mobile */
 @media (max-width: 768px) {
-  .success-header h1 {
+  .successHeader h1 {
     font-size: 1.25rem;
   }
 
-  .services-grid {
+  .servicesGrid {
     grid-template-columns: 1fr;
     max-width: 500px;
   }
 
-  .dropdown-menu {
+  .dropdownMenu {
     min-width: 240px;
   }
 }

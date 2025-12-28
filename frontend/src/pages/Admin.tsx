@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import './Admin.css';
+import styles from './Admin.module.css';
 
 interface User {
   id: number;
@@ -188,18 +188,35 @@ const Admin: React.FC = () => {
       .catch(console.error);
   };
 
+  const getRoleBadgeClass = (role: string) => {
+    return role === 'admin' ? styles.badgeAdmin : styles.badgeUser;
+  };
+
+  const getStatusBadgeClass = (status: string) => {
+    switch (status) {
+      case 'pending':
+        return styles.badgePending;
+      case 'approved':
+        return styles.badgeApproved;
+      case 'rejected':
+        return styles.badgeRejected;
+      default:
+        return '';
+    }
+  };
+
   if (loading) {
     return (
-      <div className="admin-container">
-        <div className="admin-loading">Loading...</div>
+      <div className={styles.adminContainer}>
+        <div className={styles.adminLoading}>Loading...</div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="admin-container">
-        <div className="admin-error">
+      <div className={styles.adminContainer}>
+        <div className={styles.adminError}>
           <h2>⚠️ {error}</h2>
           <button onClick={() => navigate('/success')}>Go Back</button>
         </div>
@@ -210,38 +227,38 @@ const Admin: React.FC = () => {
   const displayUsers = activeTab === 'pending' ? pendingUsers : allUsers;
 
   return (
-    <div className="admin-container">
-      <div className="admin-header">
+    <div className={styles.adminContainer}>
+      <div className={styles.adminHeader}>
         <h1>👑 Admin Dashboard</h1>
-        <button className="logout-btn" onClick={handleLogout}>
+        <button className={styles.logoutBtn} onClick={handleLogout}>
           Sign Out
         </button>
       </div>
 
       {stats && (
-        <div className="stats-grid">
-          <div className="stat-card">
-            <div className="stat-value">{stats.total}</div>
-            <div className="stat-label">Total Users</div>
+        <div className={styles.statsGrid}>
+          <div className={styles.statCard}>
+            <div className={styles.statValue}>{stats.total}</div>
+            <div className={styles.statLabel}>Total Users</div>
           </div>
-          <div className="stat-card pending">
-            <div className="stat-value">{stats.pending}</div>
-            <div className="stat-label">Pending</div>
+          <div className={`${styles.statCard} ${styles.statCardPending}`}>
+            <div className={styles.statValue}>{stats.pending}</div>
+            <div className={styles.statLabel}>Pending</div>
           </div>
-          <div className="stat-card approved">
-            <div className="stat-value">{stats.approved}</div>
-            <div className="stat-label">Approved</div>
+          <div className={`${styles.statCard} ${styles.statCardApproved}`}>
+            <div className={styles.statValue}>{stats.approved}</div>
+            <div className={styles.statLabel}>Approved</div>
           </div>
-          <div className="stat-card rejected">
-            <div className="stat-value">{stats.rejected}</div>
-            <div className="stat-label">Rejected</div>
+          <div className={`${styles.statCard} ${styles.statCardRejected}`}>
+            <div className={styles.statValue}>{stats.rejected}</div>
+            <div className={styles.statLabel}>Rejected</div>
           </div>
         </div>
       )}
 
-      <div className="admin-tabs">
+      <div className={styles.adminTabs}>
         <button
-          className={`tab ${activeTab === 'pending' ? 'active' : ''}`}
+          className={`${styles.tab} ${activeTab === 'pending' ? styles.tabActive : ''}`}
           onClick={() => {
             setActiveTab('pending');
             setSelectedUsers(new Set());
@@ -250,7 +267,7 @@ const Admin: React.FC = () => {
           Pending ({pendingUsers.length})
         </button>
         <button
-          className={`tab ${activeTab === 'all' ? 'active' : ''}`}
+          className={`${styles.tab} ${activeTab === 'all' ? styles.tabActive : ''}`}
           onClick={() => {
             setActiveTab('all');
             setSelectedUsers(new Set());
@@ -261,33 +278,31 @@ const Admin: React.FC = () => {
       </div>
 
       {activeTab === 'pending' && pendingUsers.length > 0 && (
-        <div style={{ marginBottom: '20px', display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
+        <div className={styles.bulkActions}>
           <button
-            className="approve-btn"
+            className={`${styles.approveBtn} ${styles.bulkBtn} ${selectedUsers.size === 0 ? styles.bulkBtnDisabled : ''}`}
             onClick={handleBulkApprove}
             disabled={selectedUsers.size === 0}
-            style={{ padding: '10px 20px', cursor: selectedUsers.size === 0 ? 'not-allowed' : 'pointer', opacity: selectedUsers.size === 0 ? 0.5 : 1 }}
           >
             ✓ Approve Selected ({selectedUsers.size})
           </button>
           <button
-            className="reject-btn"
+            className={`${styles.rejectBtn} ${styles.bulkBtn} ${selectedUsers.size === 0 ? styles.bulkBtnDisabled : ''}`}
             onClick={handleBulkReject}
             disabled={selectedUsers.size === 0}
-            style={{ padding: '10px 20px', cursor: selectedUsers.size === 0 ? 'not-allowed' : 'pointer', opacity: selectedUsers.size === 0 ? 0.5 : 1 }}
           >
             ✗ Reject Selected ({selectedUsers.size})
           </button>
         </div>
       )}
 
-      <div className="users-table-container">
+      <div className={styles.usersTableContainer}>
         {displayUsers.length === 0 ? (
-          <div className="empty-state">
+          <div className={styles.emptyState}>
             <p>No {activeTab === 'pending' ? 'pending' : ''} users found</p>
           </div>
         ) : (
-          <table className="users-table">
+          <table className={styles.usersTable}>
             <thead>
               <tr>
                 {activeTab === 'pending' && (
@@ -324,23 +339,23 @@ const Admin: React.FC = () => {
                   <td>{user.email}</td>
                   <td>{user.name || '-'}</td>
                   <td>
-                    <span className={`badge ${user.role}`}>{user.role}</span>
+                    <span className={`${styles.badge} ${getRoleBadgeClass(user.role)}`}>{user.role}</span>
                   </td>
                   <td>
-                    <span className={`badge ${user.status}`}>{user.status}</span>
+                    <span className={`${styles.badge} ${getStatusBadgeClass(user.status)}`}>{user.status}</span>
                   </td>
                   <td>{new Date(user.created_at).toLocaleDateString()}</td>
                   <td>
                     {user.status === 'pending' && (
-                      <div className="action-buttons">
+                      <div className={styles.actionButtons}>
                         <button
-                          className="approve-btn"
+                          className={styles.approveBtn}
                           onClick={() => handleApprove(user.id)}
                         >
                           ✓
                         </button>
                         <button
-                          className="reject-btn"
+                          className={styles.rejectBtn}
                           onClick={() => handleReject(user.id)}
                         >
                           ✗

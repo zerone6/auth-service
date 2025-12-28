@@ -17,38 +17,38 @@
 frontend/
 ├── src/
 │   ├── components/
-│   │   ├── OAuthProviderButton.tsx   # OAuth 제공자 버튼 컴포넌트
-│   │   └── OAuthProviderButton.css   # 컴포넌트 스타일
+│   │   ├── OAuthProviderButton.tsx        # OAuth 제공자 버튼 컴포넌트
+│   │   └── OAuthProviderButton.module.css # 컴포넌트 스타일 (CSS Modules)
 │   │
 │   ├── pages/
-│   │   ├── Login.tsx                 # 로그인 페이지
-│   │   ├── Login.css
-│   │   ├── SignUp.tsx                # 회원가입 페이지
-│   │   ├── SignUp.css
-│   │   ├── Pending.tsx               # 승인 대기 페이지
-│   │   ├── Pending.css
-│   │   ├── Success.tsx               # 로그인 성공 페이지
-│   │   ├── Success.css
-│   │   ├── Rejected.tsx              # 거부됨 페이지
-│   │   ├── Rejected.css
-│   │   ├── Admin.tsx                 # 관리자 대시보드
-│   │   └── Admin.css
+│   │   ├── Login.tsx                      # 로그인 페이지
+│   │   ├── Login.module.css               # (CSS Modules)
+│   │   ├── SignUp.tsx                     # 회원가입 페이지
+│   │   ├── SignUp.module.css              # (CSS Modules)
+│   │   ├── Pending.tsx                    # 승인 대기 페이지
+│   │   ├── Pending.module.css             # (CSS Modules)
+│   │   ├── Success.tsx                    # 로그인 성공 페이지
+│   │   ├── Success.module.css             # (CSS Modules)
+│   │   ├── Rejected.tsx                   # 거부됨 페이지
+│   │   ├── Rejected.module.css            # (CSS Modules)
+│   │   ├── Admin.tsx                      # 관리자 대시보드
+│   │   └── Admin.module.css               # (CSS Modules)
 │   │
 │   ├── config/
-│   │   └── oauthProviders.ts         # OAuth 제공자 설정
+│   │   └── oauthProviders.ts              # OAuth 제공자 설정
 │   │
 │   ├── types/
-│   │   └── auth.ts                   # TypeScript 타입 정의
+│   │   └── auth.ts                        # TypeScript 타입 정의
 │   │
-│   ├── App.tsx                       # 메인 앱 + 라우팅
-│   ├── App.css                       # 앱 스타일
-│   ├── main.tsx                      # 진입점
-│   └── index.css                     # 전역 스타일
+│   ├── App.tsx                            # 메인 앱 + 라우팅
+│   ├── App.css                            # 앱 스타일
+│   ├── main.tsx                           # 진입점
+│   └── index.css                          # 전역 스타일
 │
 ├── index.html
-├── nginx.conf                        # 프로덕션 Nginx 설정
-├── nginx.dev.conf                    # 개발용 Nginx 설정
-├── vite.config.ts                    # Vite 설정
+├── nginx.conf                             # 프로덕션 Nginx 설정
+├── nginx.dev.conf                         # 개발용 Nginx 설정
+├── vite.config.ts                         # Vite 설정
 ├── package.json
 ├── tsconfig.json
 └── Dockerfile
@@ -182,6 +182,30 @@ Frontend에서 호출하는 Backend API:
 
 **API 호출 시 주의사항**:
 - 모든 요청에 `credentials: 'include'` 옵션 필요 (쿠키 전달)
+
+**API 응답 형식**:
+
+모든 백엔드 API는 표준화된 응답 형식을 사용합니다:
+
+```typescript
+// 성공 응답
+interface ApiSuccessResponse<T> {
+  success: true;
+  data: T;
+  timestamp: string;
+}
+
+// 에러 응답
+interface ApiErrorResponse {
+  success: false;
+  error: {
+    code: string;    // 예: "NOT_FOUND", "UNAUTHORIZED"
+    message: string;
+  };
+  timestamp: string;
+  path: string;
+}
+```
 
 ---
 
@@ -337,33 +361,55 @@ docker run -p 8080:80 auth-frontend
 
 ---
 
-## TODO: 코드 레벨 개선 필요 항목
+## 스타일링 방식
 
-### 우선순위 중간 (P1)
+### CSS Modules
 
-#### CSS 파일 구조 개선
+모든 컴포넌트와 페이지는 **CSS Modules**를 사용하여 스타일을 관리합니다.
 
-현재 각 페이지별로 CSS 파일이 분리되어 있음:
+**장점**:
+- 클래스명 충돌 방지 (자동 스코핑)
+- 컴포넌트별 스타일 캡슐화
+- Vite 네이티브 지원 (별도 설정 불필요)
+- TypeScript와 호환 가능
 
+**사용 방법**:
+```typescript
+// 스타일 import
+import styles from './Component.module.css';
+
+// className 사용
+<div className={styles.container}>
+  <span className={styles.text}>Hello</span>
+</div>
+
+// 조건부 클래스
+<div className={`${styles.button} ${isActive ? styles.active : ''}`}>
+```
+
+**파일 구조**:
 ```
 frontend/src/pages/
-├── Admin.css
-├── Login.css
-├── Pending.css
-├── Rejected.css
-├── SignUp.css
-└── Success.css
+├── Admin.module.css
+├── Login.module.css
+├── Pending.module.css
+├── Rejected.module.css
+├── SignUp.module.css
+└── Success.module.css
+
+frontend/src/components/
+└── OAuthProviderButton.module.css
 ```
 
-**권장 개선 방안**:
-- CSS Modules 도입 (`*.module.css`)
-- 또는 styled-components/Tailwind CSS 전환
-- 공통 스타일 변수/테마 파일 분리
+---
+
+## TODO: 코드 레벨 개선 필요 항목
 
 ### 우선순위 낮음 (P2)
 
 - 컴포넌트 테스트 코드 작성 (React Testing Library)
 - Storybook 도입으로 컴포넌트 문서화
+- 공통 스타일 변수/테마 파일 분리
 
 ---
 

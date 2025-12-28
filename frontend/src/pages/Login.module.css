@@ -1,4 +1,4 @@
-.login-container {
+.loginContainer {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -7,7 +7,7 @@
   background: linear-gradient(to bottom right, #6366f1, #a855f7, #9333ea);
 }
 
-.login-card {
+.loginCard {
   background: white;
   border-radius: 16px;
   padding: 60px 40px;
@@ -16,42 +16,42 @@
   width: 100%;
 }
 
-.login-header {
+.loginHeader {
   text-align: center;
   margin-bottom: 32px;
 }
 
-.login-header h1 {
+.loginHeader h1 {
   font-size: 30px;
   margin-bottom: 12px;
   color: #1f2937;
   font-weight: 600;
 }
 
-.login-header p {
+.loginHeader p {
   color: #6b7280;
   font-size: 18px;
 }
 
-.oauth-providers {
+.oauthProviders {
   display: flex;
   flex-direction: column;
   gap: 12px;
 }
 
-.login-footer {
+.loginFooter {
   margin-top: 32px;
   text-align: center;
   padding-top: 24px;
   border-top: 1px solid #eee;
 }
 
-.login-footer p {
+.loginFooter p {
   color: #666;
   font-size: 14px;
 }
 
-.link-button {
+.linkButton {
   background: none;
   border: none;
   color: #9333ea;
@@ -61,40 +61,40 @@
   font-size: 14px;
 }
 
-.link-button:hover {
+.linkButton:hover {
   color: #7c3aed;
   border: none;
 }
 
 @media (prefers-color-scheme: dark) {
-  .login-card {
+  .loginCard {
     background: #1a1a1a;
     color: #fff;
   }
 
-  .login-header h1 {
+  .loginHeader h1 {
     color: #fff;
   }
 
-  .login-header p {
+  .loginHeader p {
     color: #aaa;
   }
 
-  .login-footer p {
+  .loginFooter p {
     color: #aaa;
   }
 
-  .login-footer {
+  .loginFooter {
     border-top-color: #333;
   }
 }
 
 @media (max-width: 640px) {
-  .login-card {
+  .loginCard {
     padding: 40px 24px;
   }
 
-  .login-header h1 {
+  .loginHeader h1 {
     font-size: 24px;
   }
 }
