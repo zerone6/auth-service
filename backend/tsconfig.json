@@ -10,7 +10,6 @@
     "forceConsistentCasingInFileNames": false,
     "resolveJsonModule": true,
     "moduleResolution": "Node10",
-    "ignoreDeprecations": "5.0",
     "sourceMap": false,
     "declaration": false,
     "removeComments": true,

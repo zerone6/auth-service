@@ -204,7 +204,7 @@ router.get(
   asyncHandler(async (req: Request, res: Response) => {
     try {
       // Get full user info from database (includes picture_url)
-      const user = await findUserById(req.user!.userId);
+      const user = await findUserById(req.user!.userId!);
 
       if (!user) {
         throw new NotFoundError('User not found');
@@ -276,7 +276,7 @@ router.get(
   asyncHandler(async (req: Request, res: Response) => {
     try {
       // Get full user info from database (includes picture_url)
-      const user = await findUserById(req.user!.userId);
+      const user = await findUserById(req.user!.userId!);
 
       if (!user) {
         throw new NotFoundError('User not found');
