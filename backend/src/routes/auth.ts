@@ -1,7 +1,7 @@
 import { Router, Request, Response } from 'express';
 import passport from 'passport';
 import { generateToken } from '../services/jwt';
-import { User } from '../db/queries';
+import { User, findUserById } from '../db/queries';
 import { config } from '../config';
 import { requireAuth } from '../middleware/auth';
 import {
@@ -204,8 +204,7 @@ router.get(
   asyncHandler(async (req: Request, res: Response) => {
     try {
       // Get full user info from database (includes picture_url)
-      const { findUserById } = await import('../db/queries');
-      const user = await findUserById(req.user!.userId!);
+      const user = await findUserById(req.user!.userId);
 
       if (!user) {
         throw new NotFoundError('User not found');
@@ -277,8 +276,7 @@ router.get(
   asyncHandler(async (req: Request, res: Response) => {
     try {
       // Get full user info from database (includes picture_url)
-      const { findUserById } = await import('../db/queries');
-      const user = await findUserById(req.user!.userId!);
+      const user = await findUserById(req.user!.userId);
 
       if (!user) {
         throw new NotFoundError('User not found');
