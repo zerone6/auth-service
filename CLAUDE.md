@@ -1,1 +1,0 @@
-./.claude/AGENTS.origin.md
