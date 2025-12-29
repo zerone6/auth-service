@@ -1,5 +1,6 @@
 -- Auth Service Database Schema
 -- PostgreSQL 16+
+-- Updated: 2025-12-28 (Multi-Provider OAuth Support)
 
 -- Create database (run as superuser if needed)
 -- CREATE DATABASE auth;
@@ -7,7 +8,8 @@
 -- Users table
 CREATE TABLE IF NOT EXISTS users (
     id SERIAL PRIMARY KEY,
-    google_id VARCHAR(255) UNIQUE NOT NULL,
+    provider VARCHAR(50) NOT NULL CHECK (provider IN ('google', 'naver', 'line', 'apple', 'kakao', 'github')),
+    provider_id VARCHAR(255) NOT NULL,
     email VARCHAR(255) UNIQUE NOT NULL,
     name VARCHAR(255),
     picture_url TEXT,
@@ -16,11 +18,13 @@ CREATE TABLE IF NOT EXISTS users (
     created_at TIMESTAMP DEFAULT NOW(),
     updated_at TIMESTAMP DEFAULT NOW(),
     approved_at TIMESTAMP,
-    approved_by INTEGER REFERENCES users(id)
+    approved_by INTEGER REFERENCES users(id),
+    CONSTRAINT unique_provider_user UNIQUE (provider, provider_id)
 );
 
 -- Indexes for users table
-CREATE INDEX IF NOT EXISTS idx_users_google_id ON users(google_id);
+CREATE INDEX IF NOT EXISTS idx_users_provider_provider_id ON users(provider, provider_id);
+CREATE INDEX IF NOT EXISTS idx_users_provider ON users(provider);
 CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
 CREATE INDEX IF NOT EXISTS idx_users_status ON users(status);
 CREATE INDEX IF NOT EXISTS idx_users_role ON users(role);
@@ -63,6 +67,7 @@ END;
 $$ LANGUAGE plpgsql;
 
 -- Trigger to automatically update updated_at
+DROP TRIGGER IF EXISTS update_users_updated_at ON users;
 CREATE TRIGGER update_users_updated_at
     BEFORE UPDATE ON users
     FOR EACH ROW
@@ -73,7 +78,8 @@ COMMENT ON TABLE users IS '사용자 정보 테이블';
 COMMENT ON TABLE sessions IS '세션 저장 테이블';
 COMMENT ON TABLE audit_log IS '관리자 활동 로그 테이블';
 
-COMMENT ON COLUMN users.google_id IS 'Google OAuth User ID';
+COMMENT ON COLUMN users.provider IS 'OAuth 프로바이더: google, naver, line, apple, kakao, github';
+COMMENT ON COLUMN users.provider_id IS '각 OAuth 프로바이더의 사용자 고유 ID';
 COMMENT ON COLUMN users.email IS '사용자 이메일';
 COMMENT ON COLUMN users.status IS '승인 상태: pending(대기), approved(승인), rejected(거부)';
 COMMENT ON COLUMN users.role IS '사용자 역할: admin(관리자), user(일반 사용자)';

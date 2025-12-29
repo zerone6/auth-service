@@ -9,7 +9,8 @@ import { generateToken, verifyToken, JwtPayload } from '../../services/jwt';
 // Mock user data
 const mockUser = {
   id: 1,
-  google_id: 'google-123',
+  provider: 'google' as const,
+  provider_id: 'google-123',
   email: 'test@example.com',
   name: 'Test User',
   picture_url: 'https://example.com/pic.jpg',
@@ -115,7 +116,7 @@ describe('JWT Service', () => {
       const payload = verifyToken(token) as JwtPayload & Record<string, unknown>;
 
       // Should not contain these fields
-      expect(payload).not.toHaveProperty('google_id');
+      expect(payload).not.toHaveProperty('provider_id');
       expect(payload).not.toHaveProperty('picture_url');
       expect(payload).not.toHaveProperty('password');
     });

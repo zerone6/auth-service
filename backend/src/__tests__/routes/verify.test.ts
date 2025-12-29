@@ -19,7 +19,8 @@ app.use('/verify', verifyRoutes);
 // Mock user data
 const mockApprovedUser = {
   id: 1,
-  google_id: 'google-123',
+  provider: 'google' as const,
+  provider_id: 'google-123',
   email: 'user@example.com',
   name: 'Test User',
   picture_url: 'https://example.com/pic.jpg',

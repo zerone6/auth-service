@@ -1,10 +1,10 @@
 import { JwtPayload } from '../services/jwt';
-import { User as DbUser } from '../db/queries';
+import { User as DbUser, AuthProvider } from '../db/queries';
 
 declare global {
   namespace Express {
     // Express.User can be either:
-    // 1. Full User object from database (Passport callback) - has id, google_id, etc.
+    // 1. Full User object from database (Passport callback) - has id, provider, provider_id, etc.
     // 2. JwtPayload from JWT token (requireAuth middleware) - has userId, email, role, status
     interface User {
       // From JwtPayload (set by requireAuth middleware)
@@ -14,7 +14,8 @@ declare global {
       status: 'pending' | 'approved' | 'rejected';
       // From DbUser (set by Passport)
       id?: number;
-      google_id?: string;
+      provider?: AuthProvider;
+      provider_id?: string;
       name?: string | null;
       picture_url?: string | null;
       created_at?: Date;

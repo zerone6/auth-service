@@ -1,7 +1,7 @@
 import passport from 'passport';
 import { Strategy as GoogleStrategy, Profile, VerifyCallback } from 'passport-google-oauth20';
 import { config } from '../config';
-import { findUserByGoogleId, createUser, updateUserProfile, User } from '../db/queries';
+import { findUserByProvider, createUser, updateUserProfile, User } from '../db/queries';
 
 /**
  * Configure Passport with Google OAuth 2.0 Strategy
@@ -22,7 +22,7 @@ export function configurePassport() {
       ) => {
         try {
           // Extract user info from Google profile
-          const googleId = profile.id;
+          const providerId = profile.id;
           const email = profile.emails?.[0]?.value;
           const name = profile.displayName;
           let pictureUrl = profile.photos?.[0]?.value;
@@ -37,15 +37,16 @@ export function configurePassport() {
           }
 
           // Check if user already exists
-          let user = await findUserByGoogleId(googleId);
+          let user = await findUserByProvider('google', providerId);
 
           if (user) {
             // Update existing user profile (name and picture may have changed)
             user = await updateUserProfile(user.id, name, pictureUrl ?? null);
           } else {
-            // Create new user
+            // Create new user with provider info
             user = await createUser(
-              googleId,
+              'google',
+              providerId,
               email,
               name,
               pictureUrl ?? null,

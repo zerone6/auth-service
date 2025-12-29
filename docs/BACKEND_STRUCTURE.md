@@ -207,7 +207,8 @@ Nginx auth_request 지시어용 엔드포인트
 | 컬럼 | 타입 | 설명 |
 |------|------|------|
 | id | SERIAL | Primary Key |
-| google_id | VARCHAR(255) | Google OAuth ID (UNIQUE) |
+| provider | VARCHAR(50) | OAuth 프로바이더: `google`, `naver`, `line`, `apple`, `kakao`, `github` |
+| provider_id | VARCHAR(255) | 각 프로바이더의 사용자 고유 ID |
 | email | VARCHAR(255) | 이메일 (UNIQUE) |
 | name | VARCHAR(255) | 이름 |
 | picture_url | TEXT | 프로필 이미지 URL |
@@ -217,6 +218,11 @@ Nginx auth_request 지시어용 엔드포인트
 | updated_at | TIMESTAMP | 수정일 |
 | approved_at | TIMESTAMP | 승인일 |
 | approved_by | INTEGER | 승인한 관리자 ID (FK) |
+
+**제약 조건**:
+- `UNIQUE(provider, provider_id)`: 동일 프로바이더 내 고유 ID 보장
+- `UNIQUE(email)`: 이메일 중복 방지 (1인 1계정)
+- `CHECK(provider IN ('google', 'naver', 'line', 'apple', 'kakao', 'github'))`
 
 #### sessions 테이블
 
@@ -241,12 +247,18 @@ Nginx auth_request 지시어용 엔드포인트
 
 ### 주요 쿼리 함수 (`src/db/queries.ts`)
 
+**타입 정의**:
+
+```typescript
+type AuthProvider = 'google' | 'naver' | 'line' | 'apple' | 'kakao' | 'github';
+```
+
 | 함수 | 설명 |
 |------|------|
-| `findUserByGoogleId(googleId)` | Google ID로 사용자 검색 |
+| `findUserByProvider(provider, providerId)` | 프로바이더와 ID로 사용자 검색 |
 | `findUserByEmail(email)` | 이메일로 사용자 검색 |
 | `findUserById(id)` | ID로 사용자 검색 |
-| `createUser(userData)` | 신규 사용자 생성 |
+| `createUser(provider, providerId, email, ...)` | 신규 사용자 생성 |
 | `updateUserProfile(userId, profileData)` | 프로필 업데이트 |
 | `approveUser(userId, adminId)` | 사용자 승인 |
 | `rejectUser(userId, adminId)` | 사용자 거부 |
@@ -486,7 +498,8 @@ interface User {
   status: 'pending' | 'approved' | 'rejected';
   // From DbUser (set by Passport)
   id?: number;
-  google_id?: string;
+  provider?: AuthProvider;
+  provider_id?: string;
   name?: string | null;
   picture_url?: string | null;
   // ... timestamps
@@ -571,8 +584,8 @@ http://localhost:3000/api-docs.json
 
 - [PROJECT_SUMMARY.md](./PROJECT_SUMMARY.md) - 전체 프로젝트 구조
 - [FRONTEND_STRUCTURE.md](./FRONTEND_STRUCTURE.md) - 프론트엔드 상세 구조
-- [refactoring_result.md](./refactoring_result.md) - 리팩토링 내역 및 TODO
+- [MIGRATION_GUIDE.md](./MIGRATION_GUIDE.md) - Multi-Provider OAuth 마이그레이션 가이드
 
 ---
 
-**Last Updated**: 2025-12-28
+**Last Updated**: 2025-12-28 (Multi-Provider OAuth 지원)

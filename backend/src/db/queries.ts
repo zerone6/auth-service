@@ -1,8 +1,14 @@
 import { pool } from './connection';
 
+/**
+ * Supported OAuth providers
+ */
+export type AuthProvider = 'google' | 'naver' | 'line' | 'apple' | 'kakao' | 'github';
+
 export interface User {
   id: number;
-  google_id: string;
+  provider: AuthProvider;
+  provider_id: string;
   email: string;
   name: string | null;
   picture_url: string | null;
@@ -24,12 +30,15 @@ export interface AuditLogEntry {
 }
 
 /**
- * Find user by Google ID
+ * Find user by provider and provider ID
  */
-export async function findUserByGoogleId(googleId: string): Promise<User | null> {
+export async function findUserByProvider(
+  provider: AuthProvider,
+  providerId: string
+): Promise<User | null> {
   const result = await pool.query(
-    'SELECT * FROM users WHERE google_id = $1',
-    [googleId]
+    'SELECT * FROM users WHERE provider = $1 AND provider_id = $2',
+    [provider, providerId]
   );
   return result.rows[0] || null;
 }
@@ -60,7 +69,8 @@ export async function findUserById(id: number): Promise<User | null> {
  * Create new user (default status: pending)
  */
 export async function createUser(
-  googleId: string,
+  provider: AuthProvider,
+  providerId: string,
   email: string,
   name: string | null,
   pictureUrl: string | null,
@@ -70,11 +80,12 @@ export async function createUser(
   const isInitialAdmin = initialAdminEmail && email === initialAdminEmail;
 
   const result = await pool.query(
-    `INSERT INTO users (google_id, email, name, picture_url, role, status, approved_at)
-     VALUES ($1, $2, $3, $4, $5, $6, $7)
+    `INSERT INTO users (provider, provider_id, email, name, picture_url, role, status, approved_at)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
      RETURNING *`,
     [
-      googleId,
+      provider,
+      providerId,
       email,
       name,
       pictureUrl,
