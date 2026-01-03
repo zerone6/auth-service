@@ -36,6 +36,14 @@ export const config = {
   frontend: {
     url: process.env.FRONTEND_URL || 'http://localhost:5173',
   },
+
+  main: {
+    url: process.env.MAIN_URL || 'http://localhost:8090',
+  },
+
+  cookie: {
+    domain: process.env.COOKIE_DOMAIN || undefined,
+  },
 };
 
 // Validate required environment variables

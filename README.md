@@ -150,15 +150,46 @@ GOOGLE_CLIENT_ID=your-client-id
 GOOGLE_CLIENT_SECRET=your-client-secret
 GOOGLE_CALLBACK_URL=http://localhost:3000/auth/google/callback
 
-# JWT
+# JWT & Session
 JWT_SECRET=your-jwt-secret
 JWT_EXPIRES_IN=7d
+SESSION_SECRET=your-session-secret
 
 # Database
 DATABASE_URL=postgresql://user:password@localhost:5432/auth
 
 # 초기 관리자
 INITIAL_ADMIN_EMAIL=admin@example.com
+```
+
+### Secret 생성 방법
+
+`JWT_SECRET`과 `SESSION_SECRET`은 최소 32자 이상의 랜덤 문자열이어야 합니다.
+
+**방법 1: OpenSSL (권장)**
+```bash
+# 64자 hex 문자열 생성
+openssl rand -hex 32
+
+# 또는 base64 인코딩
+openssl rand -base64 32
+
+echo "JWT_SECRET: $(openssl rand -hex 32)" && echo "SESSION_SECRET: $(openssl rand -hex 32)"
+```
+
+**방법 2: Node.js**
+```bash
+node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
+```
+
+**방법 3: Python**
+```bash
+python3 -c "import secrets; print(secrets.token_hex(32))"
+```
+
+**방법 4: /dev/urandom (Linux/macOS)**
+```bash
+head -c 32 /dev/urandom | xxd -p -c 64
 ```
 
 > 전체 환경변수 목록은 [backend/.env.example](backend/.env.example) 참조

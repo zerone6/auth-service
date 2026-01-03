@@ -81,18 +81,19 @@ router.get(
       secure: config.nodeEnv === 'production',
       sameSite: 'lax',
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+      ...(config.cookie.domain && { domain: config.cookie.domain }),
     });
 
     // Redirect based on user status
     if (user.status === 'pending') {
       // Redirect to pending approval page
-      return res.redirect(`${config.frontend.url}/?status=pending`);
+      return res.redirect(`${config.frontend.url}/auth/pending`);
     } else if (user.status === 'approved') {
-      // Redirect to success page (landing page)
-      return res.redirect(`${config.frontend.url}/`);
+      // Redirect to main site
+      return res.redirect(config.main.url);
     } else {
       // Rejected
-      return res.redirect(`${config.frontend.url}/?status=rejected`);
+      return res.redirect(`${config.frontend.url}/auth/rejected`);
     }
   }
 );
@@ -156,6 +157,7 @@ router.post('/logout', (req: Request, res: Response) => {
     httpOnly: true,
     secure: config.nodeEnv === 'production',
     sameSite: 'lax',
+    ...(config.cookie.domain && { domain: config.cookie.domain }),
   });
   res.json({
     success: true,
@@ -217,7 +219,7 @@ router.get(
             id: user.id,
             email: user.email,
             name: user.name,
-            picture_url: user.picture_url,
+            picture: user.picture_url,
             role: user.role,
             status: user.status,
           },
