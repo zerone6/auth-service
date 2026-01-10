@@ -29,6 +29,7 @@ router.get(
   '/google',
   passport.authenticate('google', {
     scope: ['profile', 'email'],
+    prompt: 'select_account',
   })
 );
 
@@ -80,7 +81,7 @@ router.get(
       httpOnly: true,
       secure: config.nodeEnv === 'production',
       sameSite: 'lax',
-      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+      maxAge: 24 * 60 * 60 * 1000, // 1 day
       ...(config.cookie.domain && { domain: config.cookie.domain }),
     });
 
