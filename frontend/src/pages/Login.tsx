@@ -1,35 +1,24 @@
 import React from 'react';
 import { oauthProviders } from '../config/oauthProviders';
-import OAuthProviderButton from '../components/OAuthProviderButton';
-import { OAuthProviderConfig } from '../types/auth';
-import styles from './Login.module.css';
+
+
 
 const Login: React.FC = () => {
-
-  const handleProviderClick = (provider: OAuthProviderConfig) => {
-    if (provider.enabled && provider.url) {
-      // Redirect to OAuth endpoint
-      window.location.href = provider.url;
+  React.useEffect(() => {
+    // Automatically redirect to Google login (first provider)
+    // The user requested to skip the selection screen and strictly support Google.
+    // This aligns the behavior with the main site's direct login flow.
+    const googleProvider = oauthProviders.find(p => p.id === 'google');
+    if (googleProvider && googleProvider.url) {
+      window.location.href = googleProvider.url;
     }
-  };
+  }, []);
 
   return (
-    <div className={styles.loginContainer}>
-      <div className={styles.loginCard}>
-        <div className={styles.loginHeader}>
-          <h1>로그인 선택</h1>
-          <p>원하시는 계정으로 로그인해주세요</p>
-        </div>
-
-        <div className={styles.oauthProviders}>
-          {oauthProviders.map((provider) => (
-            <OAuthProviderButton
-              key={provider.id}
-              provider={provider}
-              onClick={handleProviderClick}
-            />
-          ))}
-        </div>
+    <div className="min-h-screen flex items-center justify-center bg-slate-50">
+      <div className="text-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto mb-4"></div>
+        <p className="text-slate-600 font-medium">Google 로그인 페이지로 이동 중...</p>
       </div>
     </div>
   );

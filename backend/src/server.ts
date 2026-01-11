@@ -15,6 +15,7 @@ import adminRoutes from './routes/admin';
 import { errorHandler, notFoundHandler } from './middleware/errorHandler';
 
 const app = express();
+app.set('trust proxy', true);
 
 // Configure Passport
 configurePassport();
@@ -52,6 +53,7 @@ app.use(
       secure: config.nodeEnv === 'production',
       httpOnly: true,
       maxAge: 24 * 60 * 60 * 1000, // 24 hours
+      ...(config.cookie.domain && { domain: config.cookie.domain }),
     },
   })
 );

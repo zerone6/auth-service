@@ -76,13 +76,16 @@ router.get(
     // Generate JWT token
     const token = generateToken(user);
 
+    console.log(`[Auth] Setting cookie for user ${user.email} with domain: ${config.cookie.domain || 'undefined'}`);
+
     // Set HTTP-only cookie
     res.cookie('auth_token', token, {
       httpOnly: true,
       secure: config.nodeEnv === 'production',
       sameSite: 'lax',
       maxAge: 24 * 60 * 60 * 1000, // 1 day
-      ...(config.cookie.domain && { domain: config.cookie.domain }),
+      domain: '.hstarsp.net', // Hardcoded for reliability
+      path: '/'
     });
 
     // Redirect based on user status
@@ -158,7 +161,8 @@ router.post('/logout', (req: Request, res: Response) => {
     httpOnly: true,
     secure: config.nodeEnv === 'production',
     sameSite: 'lax',
-    ...(config.cookie.domain && { domain: config.cookie.domain }),
+    domain: '.hstarsp.net',
+    path: '/'
   });
   res.json({
     success: true,

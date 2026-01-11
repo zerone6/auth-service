@@ -10,6 +10,11 @@ export async function requireAuth(
   next: NextFunction
 ): Promise<void> {
   try {
+    // Debug logging
+    console.log('[AuthMiddleware] Request Host:', req.headers.host);
+    console.log('[AuthMiddleware] Cookies:', JSON.stringify(req.cookies));
+    console.log('[AuthMiddleware] Auth Header:', req.headers.authorization);
+
     // Try to get token from cookie first, then Authorization header
     let token = req.cookies?.auth_token;
 

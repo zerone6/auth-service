@@ -10,7 +10,7 @@ import './App.css';
 
 const App: React.FC = () => {
   return (
-    <BrowserRouter basename="/auth">
+    <BrowserRouter>
       <Routes>
         <Route path="/" element={<Navigate to="/login" replace />} />
         <Route path="/login" element={<Login />} />
